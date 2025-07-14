@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import SignIn from './pages/SignIn';
@@ -7,14 +7,15 @@ import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import GoogleCallback from './pages/GoogleCallback';
 import CompleteProfile from './pages/CompleteProfile';
+import LandingPage from './pages/LandingPage';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600">
+        <div className="min-h-screen">
           <Routes>
-            <Route path="/" element={<Navigate to="/signin" replace />} />
+            <Route path="/" element={<LandingPage />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/auth/google/callback" element={<GoogleCallback />} />

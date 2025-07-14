@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { authAPI } from '../services/api';
 
@@ -38,10 +39,10 @@ const GoogleCallback: React.FC = () => {
   }, [navigate, searchParams]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-500 to-purple-600">
+    <div className="flex items-center justify-center min-h-screen bg-background">
       <div className="flex flex-col items-center gap-4">
-        <div className="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
-        <p className="text-white font-medium">Completing Google Sign In...</p>
+        <Skeleton className="w-10 h-10 rounded-full" />
+        <p className="text-foreground font-medium">Completing Google Sign In...</p>
       </div>
     </div>
   );

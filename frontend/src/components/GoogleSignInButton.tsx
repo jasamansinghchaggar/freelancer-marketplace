@@ -1,20 +1,25 @@
-import React from 'react';
-import { useAuth } from '../context/AuthContext';
-import { RiGoogleFill } from "@remixicon/react";
 
+import React from "react";
+import { useAuth } from "../context/AuthContext";
+import { RiGoogleFill } from "@remixicon/react";
+import { Button } from "@/components/ui/button";
 
 const GoogleSignInButton: React.FC = () => {
   const { loginWithGoogle } = useAuth();
 
   return (
-    <button
+    <Button
       type="button"
       onClick={loginWithGoogle}
-      className="flex items-center justify-center gap-3 w-full px-6 py-3 bg-white border-2 border-gray-200 rounded-lg text-base font-medium text-gray-700 cursor-pointer transition-all duration-200 mb-5 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-400/20 hover:transform hover:-translate-y-0.5"
+      variant="outline"
+      className="w-full mb-5 flex items-center gap-3 bg-background text-foreground border-border font-medium"
+      style={{
+        // If you want a custom color, use a CSS variable like var(--google-btn-bg)
+      }}
     >
-      <RiGoogleFill />
+      <RiGoogleFill className="h-5 w-5" />
       Continue with Google
-    </button>
+    </Button>
   );
 };
 
