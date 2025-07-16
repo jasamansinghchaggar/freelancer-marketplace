@@ -28,6 +28,7 @@ export const userMiddleware = (req: AuthenticatedRequest, res: Response, next: N
 
     req.user = {
         id: new mongoose.Types.ObjectId(decoded.id),
+        role: decoded.role,
     };
     next();
 };

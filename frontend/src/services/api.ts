@@ -29,7 +29,7 @@ export const gigsAPI = {
 
   getGig: (id: string) => apiClient.get(`/api/v1/gigs/${id}`),
 
-  createGig: (gigData: any) => apiClient.post('/api/v1/gigs', gigData),
+  createGig: (gigData: any) => apiClient.post('/api/v1/gigs', gigData, { headers: { 'Content-Type': 'multipart/form-data' } }),
 
   updateGig: (id: string, gigData: any) => apiClient.put(`/api/v1/gigs/${id}`, gigData),
 

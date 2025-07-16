@@ -68,7 +68,7 @@ const CompleteProfile: React.FC = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen p-5 bg-background">
-      <div className="w-full max-w-md p-10 rounded-2xl shadow-2xl bg-card">
+      <div className="w-full max-w-[40vw] p-10">
         <h2 className="text-3xl font-semibold text-center text-foreground mb-8">Complete Your Profile</h2>
         <p className="text-center text-muted-foreground mb-4 leading-relaxed">
           Welcome, {user.name}! Please select your role and set a password to complete your profile.
@@ -78,17 +78,37 @@ const CompleteProfile: React.FC = () => {
         </p>
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div className="flex flex-col gap-2">
-            <label htmlFor="role" className="text-sm font-medium text-muted-foreground">I want to:</label>
-            <select
-              id="role"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              required
-              className="px-4 py-3 border border-border rounded-lg text-base bg-background text-foreground focus:outline-none"
-            >
-              <option value="client">Hire freelancers (Client)</option>
-              <option value="freelancer">Offer my services (Freelancer)</option>
-            </select>
+            <label className="text-sm font-medium text-muted-foreground">I want to:</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div
+                onClick={() => setRole('client')}
+                className={`relative p-6 border rounded-lg cursor-pointer flex items-center justify-center
+                  ${role === 'client' ? 'border-primary bg-primary/10' : 'border-border bg-background'}`}
+              >
+                {role === 'client' && (
+                  <div className="absolute top-3 right-3 w-5 h-5 bg-primary text-primary-foreground rounded-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                )}
+                <div className="text-lg font-medium text-foreground">Hire freelancers (Client)</div>
+              </div>
+              <div
+                onClick={() => setRole('freelancer')}
+                className={`relative p-6 border rounded-lg cursor-pointer flex items-center justify-center
+                  ${role === 'freelancer' ? 'border-primary bg-primary/10' : 'border-border bg-background'}`}
+              >
+                {role === 'freelancer' && (
+                  <div className="absolute top-3 right-3 w-5 h-5 bg-primary text-primary-foreground rounded-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                )}
+                <div className="text-lg font-medium text-foreground">Offer my services (Freelancer)</div>
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-col gap-2">

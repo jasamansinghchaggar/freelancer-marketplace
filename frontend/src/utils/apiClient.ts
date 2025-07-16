@@ -24,7 +24,7 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response) {      
+    if (error.response) {
       switch (error.response.status) {
         case 401:
           console.warn('Unauthorized access - user may need to login');
@@ -46,7 +46,7 @@ axiosInstance.interceptors.response.use(
     } else {
       console.error('Error:', error.message);
     }
-    
+
     return Promise.reject(error);
   }
 );

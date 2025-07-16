@@ -6,7 +6,8 @@ import { Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import GoogleSignInButton from '../components/GoogleSignInButton';
-import ComboboxDemo from '@/components/combobox-demo';
+// ...existing imports...
+// import ComboboxDemo from '@/components/combobox-demo';
 import { RiArrowLeftLine } from '@remixicon/react';
 
 const SignUp: React.FC = () => {
@@ -144,8 +145,37 @@ const SignUp: React.FC = () => {
             </div>
 
             <div className="flex flex-col gap-2 col-span-1 md:col-span-2">
-              <label htmlFor="role" className="text-sm font-medium text-muted-foreground">Role</label>
-              <ComboboxDemo value={role} onChange={setRole} />
+              <label className="text-sm font-medium text-muted-foreground">Role</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div
+                  onClick={() => setRole('client')}
+                  className={`relative p-6 border rounded-lg cursor-pointer flex items-center justify-center
+                    ${role === 'client' ? 'border-primary bg-primary/10' : 'border-border bg-background'}`}
+                >
+                  {role === 'client' && (
+                    <div className="absolute top-3 right-3 w-5 h-5 bg-primary text-primary-foreground rounded-full flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  )}
+                  <div className="text-lg font-medium text-foreground">I am a client</div>
+                </div>
+                <div
+                  onClick={() => setRole('freelancer')}
+                  className={`relative p-6 border rounded-lg cursor-pointer flex items-center justify-center
+                    ${role === 'freelancer' ? 'border-primary bg-primary/10' : 'border-border bg-background'}`}
+                >
+                  {role === 'freelancer' && (
+                    <div className="absolute top-3 right-3 w-5 h-5 bg-primary text-primary-foreground rounded-full flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  )}
+                  <div className="text-lg font-medium text-foreground">I'm a freelancer</div>
+                </div>
+              </div>
             </div>
           </div>
 
