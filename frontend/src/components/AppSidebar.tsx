@@ -18,7 +18,9 @@ import {
   RiUser3Line,
   RiLogoutBoxLine,
   RiBriefcase4Line,
-  RiMessage3Line
+  RiMessage3Line,
+  RiShoppingCartLine,
+  RiMoneyRupeeCircleLine
 } from '@remixicon/react';
 
 const AppSidebar: React.FC = () => {
@@ -28,7 +30,7 @@ const AppSidebar: React.FC = () => {
 
   const handleLogout = () => {
     signout();
-    navigate('/signin');
+    navigate('/');
   };
 
   const isActive = (path: string) => {
@@ -50,26 +52,37 @@ const AppSidebar: React.FC = () => {
     },
   ];
 
-  const roleBasedItems = user?.role === 'freelancer' ? [
-    {
-      title: 'My Applications',
-      icon: RiBriefcase4Line,
-      path: '/applications',
-      onClick: () => navigate('/applications'),
-    },
-    {
-      title: 'Create Gig',
-      icon: RiAddBoxLine,
-      path: '/gigs/new',
-      onClick: () => navigate('/gigs/new'),
-    },
-    {
-      title: 'My Gigs',
-      icon: RiBriefcase4Line,
-      path: '/my-gigs',
-      onClick: () => navigate('/my-gigs'),
-    },
-  ] : [];
+  const roleBasedItems = user?.role === 'freelancer'
+    ? [
+        {
+          title: 'Sales',
+          icon: RiMoneyRupeeCircleLine,
+          path: '/sales',
+          onClick: () => navigate('/sales'),
+        },
+        {
+          title: 'Create Gig',
+          icon: RiAddBoxLine,
+          path: '/gigs/new',
+          onClick: () => navigate('/gigs/new'),
+        },
+        {
+          title: 'My Gigs',
+          icon: RiBriefcase4Line,
+          path: '/my-gigs',
+          onClick: () => navigate('/my-gigs'),
+        },
+      ]
+    : user?.role === 'client'
+    ? [
+        {
+          title: 'Purchased Gigs',
+          icon: RiShoppingCartLine,
+          path: '/purchased-gigs',
+          onClick: () => navigate('/purchased-gigs'),
+        },
+      ]
+    : [];
 
   const accountItems = [
     {

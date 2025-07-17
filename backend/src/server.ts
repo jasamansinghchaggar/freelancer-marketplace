@@ -14,6 +14,8 @@ import userRoutes from "./routes/user.route";
 import gigsRouter from "./routes/gig.route";
 import authRoutes from "./routes/auth.route";
 import profileRoutes from "./routes/profile.route";
+import categoryRoutes from "./routes/category.route";
+import purchaseRoutes from "./routes/purchase.route";
 
 const app = express();
 
@@ -50,6 +52,8 @@ app.use("/auth", authRoutes)
 app.use("/api/v1/gigs", gigsRouter)
 app.use("/api/v1/user", userRoutes)
 app.use("/api/v1/profile", profileRoutes)
+app.use("/api/v1/categories", categoryRoutes);
+app.use("/api/v1/purchases", purchaseRoutes);
 
 const startServer = async (): Promise<void> => {
     try {

@@ -12,6 +12,14 @@ import CompleteProfile from './pages/CompleteProfile';
 import LandingPage from './pages/LandingPage';
 import Gigs from './pages/Gigs';
 import GigDetail from './pages/GigDetail';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsAndConditions from './pages/TermsAndConditions';
+import Contact from './pages/Contact';
+import Messages from './pages/Messages';
+import MyGigs from './pages/MyGigs';
+import EditGig from './pages/EditGig';
+import PurchasedGigs from './pages/PurchasedGigs';
+import Sales from './pages/Sales';
 
 function App() {
   return (
@@ -71,7 +79,47 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path='*' element={<NotFound />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/messages" element={
+              <ProtectedRoute>
+                <Messages />
+              </ProtectedRoute>
+            } />
+            <Route
+              path="/my-gigs"
+              element={
+                <ProtectedRoute>
+                  <MyGigs />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/gigs/:id/edit"
+              element={
+                <ProtectedRoute>
+                  <EditGig />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/purchased-gigs"
+              element={
+                <ProtectedRoute>
+                  <PurchasedGigs />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/sales"
+              element={
+                <ProtectedRoute>
+                  <Sales />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
       </Router>

@@ -35,3 +35,12 @@ export const gigsAPI = {
 
   deleteGig: (id: string) => apiClient.delete(`/api/v1/gigs/${id}`),
 };
+export const purchaseAPI = {
+  purchaseGig: (gigId: string) => apiClient.post(`/api/v1/purchases/${gigId}`),
+  getClientPurchases: () => apiClient.get('/api/v1/purchases/client'),
+  getFreelancerPurchases: () => apiClient.get('/api/v1/purchases/freelancer'),
+};
+export const categoriesAPI = {
+  getCategories: () => apiClient.get('/api/v1/categories'),
+  createCategory: (name: string) => apiClient.post('/api/v1/categories', { name }),
+};

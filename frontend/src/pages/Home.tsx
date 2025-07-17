@@ -70,10 +70,14 @@ const Home: React.FC = () => {
                       <img src={gig.imageURL} alt={gig.title} className="w-full h-40 object-cover" />
                       <div className="p-4">
                         <h3 className="text-lg font-semibold truncate">{gig.title}</h3>
-                        <p className="text-sm text-muted-foreground truncate">{gig.category}</p>
+                        <p className="text-sm text-muted-foreground truncate">
+                          {(typeof gig.category === 'string'
+                            ? gig.category
+                            : (gig.category as any)?.name) ?? 'Uncategorized'}
+                        </p>
                         <div className="mt-2 flex justify-between items-center">
                           <span className="text-sm font-medium">${gig.price}</span>
-                          <span className="text-xs text-muted-foreground">By {gig.userId.name}</span>
+                          <span className="text-xs text-muted-foreground">By {gig.userId?.name ?? 'Unknown'}</span>
                         </div>
                       </div>
                     </div>

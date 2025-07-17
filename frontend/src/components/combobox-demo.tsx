@@ -7,6 +7,7 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
+  CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command"
@@ -16,24 +17,25 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-const roles = [
-  {
-    value: "client",
-    label: "Client",
-  },
-  {
-    value: "freelancer",
-    label: "Freelancer",
-  },
-]
+interface ComboboxItem {
+  value: string;
+  label: string;
+}
 
 interface ComboboxDemoProps {
   value: string;
   onChange: (value: string) => void;
+  items: ComboboxItem[];
+  placeholder?: string;
 }
 
-export default function ComboboxDemo({ value, onChange }: ComboboxDemoProps) {
+export default function ComboboxDemo({ value, onChange, items, placeholder }: ComboboxDemoProps) {
   const [open, setOpen] = React.useState(false);
+  const [search, setSearch] = React.useState('');
+  const query = search.toLowerCase();
+  const filteredItems = items.filter(item =>
+    typeof item.label === 'string' && item.label.toLowerCase().includes(query)
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -45,20 +47,30 @@ export default function ComboboxDemo({ value, onChange }: ComboboxDemoProps) {
           className="w-full justify-between"
         >
           {value
-            ? roles.find((role) => role.value === value)?.label
-            : "Select role..."}
+            ? (items.find((item) => item.value === value)?.label ?? value)
+            : placeholder || 'Select...'}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
+      <PopoverContent side="top" align="center" className="w-full p-0">
         <Command>
+          <CommandInput
+            placeholder={`Search${placeholder ? ` ${placeholder.replace('Select ','').replace('...','')}` : ''}...`}
+            className="h-9"
+            value={search}
+            onValueChange={(val: string) => setSearch(val)}
+          />
           <CommandList>
-            <CommandEmpty>No role found.</CommandEmpty>
+            {/* Show empty when no matches */}
+            {filteredItems.length === 0 && (
+              <CommandEmpty>No category found, please create a new or select from the list.</CommandEmpty>
+            )}
             <CommandGroup>
-              {roles.map((role) => (
+              {/* List existing matches */}
+              {filteredItems.map((item) => (
                 <CommandItem
-                  key={role.value}
-                  value={role.value}
+                  key={item.value}
+                  value={item.value}
                   onSelect={(currentValue) => {
                     if (currentValue !== value) {
                       onChange(currentValue);
@@ -66,16 +78,29 @@ export default function ComboboxDemo({ value, onChange }: ComboboxDemoProps) {
                     setOpen(false);
                   }}
                 >
-                  {role.label}
+                  {item.label}
                   <Check
                     className={cn(
                       "ml-auto",
-                      value === role.value ? "opacity-100" : "opacity-0"
+                      value === item.value ? "opacity-100" : "opacity-0"
                     )}
                   />
                 </CommandItem>
               ))}
             </CommandGroup>
+            {/* Option to add new item if search text is not already an option */}
+            {search && !items.some(i => i.value.toLowerCase() === search.toLowerCase()) && (
+              <CommandItem
+                value={search}
+                onSelect={() => {
+                  onChange(search);
+                  setSearch('');
+                  setOpen(false);
+                }}
+              >
+                Add "{search}"
+              </CommandItem>
+            )}
           </CommandList>
         </Command>
       </PopoverContent>

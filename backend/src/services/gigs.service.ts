@@ -14,7 +14,7 @@ export const createGigService = async (data: {
     title: string;
     desc: string;
     price: number;
-    category: string;
+    category: Types.ObjectId;
     fileId: string;
     imageURL: string;
     userId: Types.ObjectId;
@@ -23,15 +23,16 @@ export const createGigService = async (data: {
 };
 
 export const getGigsService = async () => {
-    const res = await Gig.find().populate('userId', 'name email');
+    const res = await Gig.find()
+        .populate('userId', 'name email')
+        .populate('category', 'name');
     return res;
 };
 
 export const getGigByIdService = async (id: string) => {
-    return await Gig.findById(id).populate(
-        'userId',
-        'name email'
-    );
+    return await Gig.findById(id)
+        .populate('userId', 'name email')
+        .populate('category', 'name');
 };
 
 export const updateGigService = async (id: string, updateData: any) => {
