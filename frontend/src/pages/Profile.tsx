@@ -42,7 +42,7 @@ const Profile: React.FC = () => {
                     <label className="block text-sm font-medium mb-1">Name</label>
                     <div className='flex gap-3 items-center'>
                         <Input className='max-w-[20vw]' value={profile.name} disabled />
-                        <RiEditLine className='cursor-pointer'/>
+                        <RiEditLine className='cursor-pointer' />
                     </div>
                 </div>
                 <div>
@@ -54,10 +54,7 @@ const Profile: React.FC = () => {
                 </div>
                 <div>
                     <label className="block text-sm font-medium mb-1">Role</label>
-                    <div className='flex gap-3 items-center'>
-                        <Input className='max-w-[20vw]' value={profile.role} disabled />
-                        <RiEditLine className='cursor-pointer' />
-                    </div>
+                    <Input className='max-w-[20vw]' value={profile.role} disabled />
                 </div>
             </div>
         </Layout>
