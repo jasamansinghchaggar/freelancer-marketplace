@@ -87,13 +87,13 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Bottom bar */}
-        <div className="flex flex-col md:flex-row justify-between items-center pt-6 border-t border-border">
-          <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-4 md:mb-0">
+        <div className="flex flex-col md:flex-row justify-between items-start pt-6 border-t border-border">
+          <div className="hidden sm:flex sm:items-center sm:space-x-2 sm:text-sm sm:text-muted-foreground sm:mb-4 md:mb-0">
             <RiCopyrightLine className="w-4 h-4" />
             <span>{currentYear} Freelancer Marketplace. All rights reserved.</span>
           </div>
           
-          <div className="flex space-x-6 text-sm text-muted-foreground">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4.5 text-sm text-muted-foreground">
             <Link to="/privacy-policy" className="hover:text-foreground transition-colors">
               Privacy Policy
             </Link>

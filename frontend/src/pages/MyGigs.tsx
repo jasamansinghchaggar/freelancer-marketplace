@@ -56,7 +56,7 @@ const MyGigs: React.FC = () => {
 
     return (
         <Layout>
-            <div className="p-4">
+            <div>
                 <h1 className="text-2xl font-semibold mb-4">My Gigs</h1>
                 {gigs.length === 0 ? (
                     <p>No gigs found. <Button variant="secondary" onClick={() => navigate('/gigs/new')}>Create one</Button></p>

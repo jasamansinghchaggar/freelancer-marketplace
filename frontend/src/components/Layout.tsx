@@ -32,8 +32,7 @@ const Layout: React.FC<LayoutProps> = ({ children, showSidebar = true }) => {
         <div className="flex flex-grow">
           <AppSidebar />
           <SidebarInset className="flex flex-col flex-grow">
-            {/* Mobile sidebar trigger */}
-            <div className="md:hidden p-4 border-b border-border">
+            <div className="md:hidden p-4 border-border">
               <SidebarTrigger className="bg-background border border-border shadow-sm" />
             </div>
 
@@ -43,7 +42,6 @@ const Layout: React.FC<LayoutProps> = ({ children, showSidebar = true }) => {
               </div>
             </main>
 
-            {/* Footer only spans the main content area width */}
             <Footer />
           </SidebarInset>
         </div>

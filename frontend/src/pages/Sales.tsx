@@ -47,7 +47,7 @@ const Sales: React.FC = () => {
 
   return (
     <Layout>
-      <div className="p-4">
+      <div>
         <h1 className="text-2xl font-semibold mb-4">Sales</h1>
         {sales.length === 0 ? (
           <p>No sales yet.</p>

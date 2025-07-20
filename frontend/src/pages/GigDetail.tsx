@@ -30,18 +30,14 @@ const GigDetail: React.FC = () => {
   const [gig, setGig] = useState<Gig | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // Track if current user has purchased this gig
   const [hasPurchased, setHasPurchased] = useState(false);
-  // For freelancers: list of clients who purchased this gig
-  const [clients, setClients] = useState<{name: string; email: string}[]>([]);
-  // If freelancer, fetch sales for this gig
+  const [clients, setClients] = useState<{ name: string; email: string }[]>([]);
   useEffect(() => {
     if (user?.role === 'freelancer' && gig) {
       purchaseAPI.getFreelancerPurchases()
         .then(res => {
           if (Array.isArray(res.data)) {
             const filtered = res.data.filter((p: any) => {
-              // gigId may be populated or just an id string
               if (typeof p.gigId === 'string') {
                 return p.gigId === gig._id;
               } else if (typeof p.gigId === 'object' && p.gigId?._id) {
@@ -80,13 +76,11 @@ const GigDetail: React.FC = () => {
       .finally(() => setLoading(false));
   }, [id]);
 
-  // Check if user already purchased this gig
   useEffect(() => {
     if (gig && user) {
       purchaseAPI.getClientPurchases()
         .then(res => {
           const purchased = Array.isArray(res.data) && res.data.some((p: any) => {
-            // gigId may be populated or just an id string
             if (typeof p.gigId === 'string') {
               return p.gigId === gig._id;
             } else if (typeof p.gigId === 'object' && p.gigId?._id) {
@@ -166,9 +160,8 @@ const GigDetail: React.FC = () => {
   }
 
   const isOwner = user?.id === gig.userId._id;
-  // Handler to delete gig for owner
   const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this gig?')) {
+    if (confirm('Are you sure you want to delete this gig?')) {
       try {
         await gigsAPI.deleteGig(gig._id);
         navigate('/my-gigs');
@@ -180,18 +173,18 @@ const GigDetail: React.FC = () => {
 
   return (
     <Layout>
-      <div className="max-w-4xl">
+      <div className="max-w-full">
         {/* Back button */}
         <Button
           onClick={handleBack}
-          variant="ghost"
+          variant="secondary"
           className="mb-6"
         >
           <RiArrowLeftLine className="w-4 h-4 mr-2" />
           Back to Gigs
         </Button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 pt-3">
             <div className="mb-6">
               <img
@@ -231,7 +224,7 @@ const GigDetail: React.FC = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-1 w-max">
+          <div className="lg:col-span-1 w-full">
             <div className="bg-card border rounded-lg p-6 sticky top-24">
               <div className="mb-6">
                 <div className="flex items-center text-2xl font-bold text-primary mb-2">
