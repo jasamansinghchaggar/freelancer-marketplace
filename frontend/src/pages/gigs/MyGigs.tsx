@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { gigsAPI } from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import { gigsAPI } from '@/services/api';
+import { useAuth } from '@/context/AuthContext';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
-import { purchaseAPI } from '../services/api';
+import { purchaseAPI } from '@/services/api';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface Purchase {

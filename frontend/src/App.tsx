@@ -1,25 +1,25 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import SignIn from './pages/SignIn';
-import SignUp from './pages/SignUp';
-import Home from './pages/Home';
-import NotFound from './pages/NotFound';
-import CreateGig from './pages/CreateGig';
-import Profile from './pages/Profile';
-import GoogleCallback from './pages/GoogleCallback';
-import CompleteProfile from './pages/CompleteProfile';
-import LandingPage from './pages/LandingPage';
-import Gigs from './pages/Gigs';
-import GigDetail from './pages/GigDetail';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import TermsAndConditions from './pages/TermsAndConditions';
-import Contact from './pages/Contact';
-import Messages from './pages/Messages';
-import MyGigs from './pages/MyGigs';
-import EditGig from './pages/EditGig';
-import PurchasedGigs from './pages/PurchasedGigs';
-import Sales from './pages/Sales';
+import SignIn from './pages/authentication/SignIn';
+import SignUp from './pages/authentication/SignUp';
+import Home from './pages/general/Home';
+import NotFound from './pages/static/NotFound';
+import CreateGig from './pages/gigs/CreateGig';
+import Profile from './pages/profile/Profile';
+import GoogleCallback from './pages/authentication/GoogleCallback';
+import CompleteProfile from './pages/profile/CompleteProfile';
+import LandingPage from './pages/general/LandingPage';
+import Gigs from './pages/gigs/Gigs';
+import GigDetail from './pages/gigs/GigDetail';
+import PrivacyPolicy from './pages/static/PrivacyPolicy';
+import TermsAndConditions from './pages/static/TermsAndConditions';
+import Contact from './pages/static/Contact';
+import Messages from './pages/messaging/Messages';
+import MyGigs from './pages/gigs/MyGigs';
+import EditGig from './pages/gigs/EditGig';
+import PurchasedGigs from './pages/marketplace/PurchasedGigs';
+import Sales from './pages/marketplace/Sales';
 
 function App() {
   return (

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { gigsAPI, purchaseAPI } from '../services/api';
+import { gigsAPI, purchaseAPI } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import Layout from '@/components/Layout';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { RiArrowLeftLine, RiCalendarLine } from '@remixicon/react';
 
 interface Gig {

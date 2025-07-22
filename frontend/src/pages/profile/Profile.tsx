@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { authAPI } from '../services/api';
+import { authAPI } from '@/services/api';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { RiEditLine } from '@remixicon/react';

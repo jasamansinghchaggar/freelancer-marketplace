@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { gigsAPI, categoriesAPI } from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import { gigsAPI, categoriesAPI } from '@/services/api';
+import { useAuth } from '@/context/AuthContext';
 import Layout from '@/components/Layout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import ComboboxDemo from '../components/combobox-demo';
+import ComboboxDemo from '@/components/combobox-demo';
 
 const EditGig: React.FC = () => {
   // State for category options

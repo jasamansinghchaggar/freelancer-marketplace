@@ -4,10 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import GoogleSignInButton from '../components/GoogleSignInButton';
-// ...existing imports...
-// import ComboboxDemo from '@/components/combobox-demo';
+import { useAuth } from '@/context/AuthContext';
+import GoogleSignInButton from '@/components/GoogleSignInButton';
 import { RiArrowLeftLine } from '@remixicon/react';
 
 const SignUp: React.FC = () => {

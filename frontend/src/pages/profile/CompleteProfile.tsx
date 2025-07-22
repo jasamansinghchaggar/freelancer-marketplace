@@ -3,8 +3,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { profileAPI } from '../services/api';
+import { useAuth } from '@/context/AuthContext';
+import { profileAPI } from '@/services/api';
 
 const CompleteProfile: React.FC = () => {
   const [role, setRole] = useState('client');
