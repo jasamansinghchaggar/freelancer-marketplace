@@ -48,73 +48,101 @@ const Profile: React.FC = () => {
 
     return (
         <Layout>
-            <div className="max-w-3xl space-y-6">
-                <h1 className="text-2xl font-semibold">Profile</h1>
+            <div className="max-w-4xl space-y-4 sm:space-y-6 pb-4">
+                <h1 className="text-xl sm:text-2xl font-semibold">Profile</h1>
                 <div>
                     <label className="block text-sm font-medium mb-1">Name</label>
                     <div className='flex gap-3 items-center'>
                         <Input
-                            className='max-w-[20vw]'
+                            className='w-full sm:max-w-xs lg:max-w-sm'
                             value={isEditingName ? editableName : profile.name}
                             disabled={!isEditingName}
                             onChange={e => setEditableName(e.target.value)}
                         />
-                        {isEditingName ? (
-                            <>
-                                <RiCheckLine className='cursor-pointer' onClick={async () => {
-                                    try {
-                                        const res = await authAPI.updateProfile({ name: editableName, email: profile.email });
-                                        setProfile(res.data.user);
-                                        setIsEditingName(false);
-                                    } catch (err) {
-                                        console.error(err);
-                                        alert('Failed to update name');
-                                    }
-                                }} />
-                                <RiCloseLine className='cursor-pointer' onClick={() => {
-                                    setIsEditingName(false);
-                                    setEditableName(profile.name);
-                                }} />
-                            </>
-                        ) : (
-                            <RiEditLine className='cursor-pointer' onClick={() => setIsEditingName(true)} />
-                        )}
+                        <div className="flex gap-2">
+                            {isEditingName ? (
+                                <>
+                                    <RiCheckLine
+                                        className='cursor-pointer hover:text-green-600 transition-colors'
+                                        size={20}
+                                        onClick={async () => {
+                                            try {
+                                                const res = await authAPI.updateProfile({ name: editableName, email: profile.email });
+                                                setProfile(res.data.user);
+                                                setIsEditingName(false);
+                                            } catch (err) {
+                                                console.error(err);
+                                                alert('Failed to update name');
+                                            }
+                                        }}
+                                    />
+                                    <RiCloseLine
+                                        className='cursor-pointer hover:text-red-600 transition-colors'
+                                        size={20}
+                                        onClick={() => {
+                                            setIsEditingName(false);
+                                            setEditableName(profile.name);
+                                        }}
+                                    />
+                                </>
+                            ) : (
+                                <RiEditLine
+                                    className='cursor-pointer hover:text-primary transition-colors'
+                                    size={20}
+                                    onClick={() => setIsEditingName(true)}
+                                />
+                            )}
+                        </div>
                     </div>
                 </div>
                 <div>
                     <label className="block text-sm font-medium mb-1">Email</label>
                     <div className='flex gap-3 items-center'>
                         <Input
-                            className='max-w-[20vw]'
+                            className='w-full sm:max-w-xs lg:max-w-sm'
                             value={isEditingEmail ? editableEmail : profile.email}
                             disabled={!isEditingEmail}
                             onChange={e => setEditableEmail(e.target.value)}
                         />
-                        {isEditingEmail ? (
-                            <>
-                                <RiCheckLine className='cursor-pointer' onClick={async () => {
-                                    try {
-                                        const res = await authAPI.updateProfile({ name: profile.name, email: editableEmail });
-                                        setProfile(res.data.user);
-                                        setIsEditingEmail(false);
-                                    } catch (err) {
-                                        console.error(err);
-                                        alert('Failed to update email');
-                                    }
-                                }} />
-                                <RiCloseLine className='cursor-pointer' onClick={() => {
-                                    setIsEditingEmail(false);
-                                    setEditableEmail(profile.email);
-                                }} />
-                            </>
-                        ) : (
-                            <RiEditLine className='cursor-pointer' onClick={() => setIsEditingEmail(true)} />
-                        )}
+                        <div className="flex gap-2">
+                            {isEditingEmail ? (
+                                <>
+                                    <RiCheckLine
+                                        className='cursor-pointer hover:text-green-600 transition-colors'
+                                        size={20}
+                                        onClick={async () => {
+                                            try {
+                                                const res = await authAPI.updateProfile({ name: profile.name, email: editableEmail });
+                                                setProfile(res.data.user);
+                                                setIsEditingEmail(false);
+                                            } catch (err) {
+                                                console.error(err);
+                                                alert('Failed to update email');
+                                            }
+                                        }}
+                                    />
+                                    <RiCloseLine
+                                        className='cursor-pointer hover:text-red-600 transition-colors'
+                                        size={20}
+                                        onClick={() => {
+                                            setIsEditingEmail(false);
+                                            setEditableEmail(profile.email);
+                                        }}
+                                    />
+                                </>
+                            ) : (
+                                <RiEditLine
+                                    className='cursor-pointer hover:text-primary transition-colors'
+                                    size={20}
+                                    onClick={() => setIsEditingEmail(true)}
+                                />
+                            )}
+                        </div>
                     </div>
                 </div>
                 <div>
                     <label className="block text-sm font-medium mb-1">Role</label>
-                    <Input className='max-w-[20vw]' value={profile.role} disabled />
+                    <Input className='w-full sm:max-w-xs lg:max-w-sm' value={profile.role} disabled />
                 </div>
             </div>
         </Layout>

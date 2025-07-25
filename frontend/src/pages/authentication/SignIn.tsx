@@ -73,10 +73,10 @@ const SignIn: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-5 bg-background">
-      <div className="w-full max-w-md p-10">
-        <h2 className="text-3xl font-semibold text-center text-foreground mb-8">Sign In</h2>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8 bg-background">
+      <div className="w-full max-w-xs sm:max-w-sm md:max-w-md p-6 sm:p-8 lg:p-10">
+        <h2 className="text-2xl sm:text-3xl font-semibold text-center text-foreground mb-6 sm:mb-8">Sign In</h2>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:gap-5">
           <div className="flex flex-col gap-2">
             <label htmlFor="email" className="text-sm font-medium text-muted-foreground">Email</label>
             <Input
@@ -86,6 +86,7 @@ const SignIn: React.FC = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="Enter your email"
+              className="text-sm sm:text-base"
             />
           </div>
 
@@ -99,6 +100,7 @@ const SignIn: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="Enter your password"
+                className="text-sm sm:text-base pr-10"
               />
               <button
                 type="button"
@@ -110,29 +112,35 @@ const SignIn: React.FC = () => {
             </div>
           </div>
 
-          {error && <div className="bg-destructive/10 text-destructive px-3 py-3 rounded-lg border border-destructive/30 text-sm text-center">{error}</div>}
+          {error && (
+            <div className="bg-destructive/10 text-destructive px-3 py-3 rounded-lg border border-destructive/30 text-xs sm:text-sm text-center">
+              {error}
+            </div>
+          )}
 
           <Button
             type="submit"
             disabled={loading}
-            className="mt-2"
+            className="mt-2 text-sm sm:text-base"
           >
             {loading ? 'Signing In...' : 'Sign In'}
           </Button>
         </form>
 
-        <div className="relative text-center my-5">
+        <div className="relative text-center my-4 sm:my-5">
           <div className="absolute top-1/2 left-0 right-0 h-px bg-border"></div>
-          <span className="relative bg-card px-4 text-muted-foreground text-sm">or</span>
+          <span className="relative bg-card px-4 text-muted-foreground text-xs sm:text-sm">or</span>
         </div>
 
         <GoogleSignInButton />
 
-        <p className="text-center mt-5 text-muted-foreground">
+        <p className="text-center mt-4 sm:mt-5 text-xs sm:text-sm text-muted-foreground">
           Don't have an account? <Link to="/signup" className="text-primary font-medium hover:underline">Sign Up</Link>
         </p>
       </div>
-      <Link to={"/"} className='flex items-center gap-2 text-muted-foreground underline underline-offset-2'> <RiArrowLeftLine size={20}/> Go Home</Link>
+      <Link to={"/"} className='flex items-center gap-2 text-muted-foreground underline underline-offset-2 text-sm sm:text-base'> 
+        <RiArrowLeftLine size={20}/> Go Home
+      </Link>
     </div>
   );
 };

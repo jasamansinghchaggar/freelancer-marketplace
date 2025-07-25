@@ -100,7 +100,7 @@ const AppSidebar: React.FC = () => {
   ];
 
   return (
-    <Sidebar className="pt-20 border-r border-border" collapsible="icon">
+    <Sidebar className="border-border overflow-y-hidden" collapsible="icon">
       <SidebarContent className="bg-background">
         {/* Main Navigation */}
         <SidebarGroup>

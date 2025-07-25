@@ -89,40 +89,56 @@ const CreateGig: React.FC = () => {
 
     return (
         <Layout>
-            <div className="max-w-3xl">
-                <h1 className="text-2xl font-semibold mb-4">Create New Gig</h1>
-                <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="max-w-4xl">
+                <h1 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">Create New Gig</h1>
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                     <div>
-                        <label className="block mb-1 font-medium">Title</label>
-                        <Input value={title} onChange={e => setTitle(e.target.value)} required />
+                        <label className="block mb-2 font-medium text-sm sm:text-base">Title</label>
+                        <Input 
+                            value={title} 
+                            onChange={e => setTitle(e.target.value)} 
+                            required 
+                            className="text-sm sm:text-base"
+                            placeholder="Enter gig title"
+                        />
                     </div>
                     <div>
-                        <label className="block mb-1 font-medium">Description</label>
+                        <label className="block mb-2 font-medium text-sm sm:text-base">Description</label>
                         <textarea
                             ref={descRef}
                             value={desc}
                             onChange={e => setDesc(e.target.value)}
-                            className="w-full p-2 border border-border rounded min-h-24 resize-none"
+                            className="w-full p-3 border border-border rounded min-h-24 resize-none text-sm sm:text-base"
                             rows={4}
                             required
+                            placeholder="Describe your gig in detail..."
                         />
                     </div>
                     <div>
-                        <label className="block mb-1 font-medium">Image</label>
+                        <label className="block mb-2 font-medium text-sm sm:text-base">Image</label>
                         <Input
                             type="file"
                             accept="image/*"
                             onChange={e => setFile(e.target.files ? e.target.files[0] : null)}
                             required
+                            className="text-sm sm:text-base"
                         />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block mb-1 font-medium">Price (₹)</label>
-                            <Input type="number" value={price} onChange={e => setPrice(e.target.value)} required />
+                            <label className="block mb-2 font-medium text-sm sm:text-base">Price (₹)</label>
+                            <Input 
+                                type="number" 
+                                value={price} 
+                                onChange={e => setPrice(e.target.value)} 
+                                required 
+                                className="text-sm sm:text-base"
+                                placeholder="0"
+                                min="0"
+                            />
                         </div>
                         <div>
-                            <label className="block mb-1 font-medium">Category</label>
+                            <label className="block mb-2 font-medium text-sm sm:text-base">Category</label>
                             <ComboboxDemo
                               value={category}
                               onChange={(val: string) => {
@@ -136,10 +152,28 @@ const CreateGig: React.FC = () => {
                             />
                         </div>
                     </div>
-                    {error && <p className="text-destructive">{error}</p>}
-                    <Button type="submit" disabled={loadingSubmit}>
-                        {loadingSubmit ? 'Creating...' : 'Create Gig'}
-                    </Button>
+                    {error && (
+                        <div className="bg-destructive/10 text-destructive px-3 py-3 rounded-lg border border-destructive/30 text-sm">
+                            {error}
+                        </div>
+                    )}
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
+                        <Button 
+                            type="submit" 
+                            disabled={loadingSubmit}
+                            className="w-full sm:w-auto text-sm sm:text-base"
+                        >
+                            {loadingSubmit ? 'Creating...' : 'Create Gig'}
+                        </Button>
+                        <Button 
+                            type="button" 
+                            variant="outline"
+                            onClick={() => navigate('/gigs')}
+                            className="w-full sm:w-auto text-sm sm:text-base"
+                        >
+                            Cancel
+                        </Button>
+                    </div>
                 </form>
             </div>
         </Layout>

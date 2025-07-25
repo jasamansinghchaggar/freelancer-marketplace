@@ -18,29 +18,51 @@ const LandingPage: React.FC = () => {
     return (
         <div className='h-[100dvh] w-full'>
             <Navbar />
-            <main className='w-full h-full flex flex-col items-center justify-center relative px-5 bg-background text-foreground'>
-                <h1 className="text-5xl font-bold mb-4 text-center">Find <span className='font-heading'>Your</span> Perfect Freelancer</h1>
-                <p className="text-lg text-muted-foreground mb-8 text-center max-w-xl">
-                    Connect with talented professionals to build your dream project. Post a job,
-                    review candidates, and collaborate—all in one place.
-                </p>
-                <div className="flex space-x-4 mb-16">
-                    <Button onClick={() => navigate('/signup')}>Get Started</Button>
-                    <Button variant="outline" onClick={() => navigate('/signin')}>Sign In</Button>
+            <main className='w-full h-max flex flex-col items-center justify-center relative p-4 sm:p-6 lg:p-8 bg-background text-foreground'>
+                {/* Hero Section */}
+                <div className="flex flex-col items-center justify-center flex-1 max-w-7xl mx-auto">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 text-center leading-tight">
+                        Find <span className='font-heading'>Your</span> Perfect Freelancer
+                    </h1>
+                    <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mb-6 sm:mb-8 text-center max-w-xs sm:max-w-md lg:max-w-xl px-2">
+                        Connect with talented professionals to build your dream project. Post a job,
+                        review candidates, and collaborate—all in one place.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-12 lg:mb-16 w-full sm:w-auto">
+                        <Button
+                            onClick={() => navigate('/signup')}
+                            className="w-full sm:w-auto text-sm sm:text-base"
+                            size="default"
+                        >
+                            Get Started
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={() => navigate('/signin')}
+                            className="w-full sm:w-auto text-sm sm:text-base"
+                            size="default"
+                        >
+                            Sign In
+                        </Button>
+                    </div>
                 </div>
-                <section className="w-full bg-secondary-bg py-16">
-                    <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="p-6 bg-card border hover:shadow-[6px_6px_0px_2px] hover:-translate-y-1 animation duration-200">
-                            <h3 className="text-xl font-semibold mb-2 text-foreground">Post a Job</h3>
-                            <p className="text-muted-foreground">Describe your project and get proposals from top freelancers in minutes.</p>
-                        </div>
-                        <div className="p-6 bg-card border hover:shadow-[6px_6px_0px_2px] hover:-translate-y-1 animation duration-200">
-                            <h3 className="text-xl font-semibold mb-2 text-foreground">Browse Freelancers</h3>
-                            <p className="text-muted-foreground">Search experts by skill, rate, and reviews to find the perfect match.</p>
-                        </div>
-                        <div className="p-6 bg-card border hover:shadow-[6px_6px_0px_2px] hover:-translate-y-1 animation duration-200">
-                            <h3 className="text-xl font-semibold mb-2 text-foreground">Secure Payments</h3>
-                            <p className="text-muted-foreground">Pay safely with our escrow system and release funds upon satisfaction.</p>
+
+                {/* Features Section */}
+                <section className="w-full bg-secondary-bg py-8 sm:py-12 lg:py-16">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+                            <div className="p-4 sm:p-6 bg-card border md:hover:shadow-[8px_8px_0px_2px] md:hover:-translate-y-1 md:hover:-translate-x-1 transition-all duration-200 rounded-lg">
+                                <h3 className="text-lg sm:text-xl font-semibold mb-2 text-foreground">Post a Job</h3>
+                                <p className="text-sm sm:text-base text-muted-foreground">Describe your project and get proposals from top freelancers in minutes.</p>
+                            </div>
+                            <div className="p-4 sm:p-6 bg-card border md:hover:shadow-[8px_8px_0px_2px] md:hover:-translate-y-1 md:hover:-translate-x-1 transition-all duration-200 rounded-lg">
+                                <h3 className="text-lg sm:text-xl font-semibold mb-2 text-foreground">Browse Freelancers</h3>
+                                <p className="text-sm sm:text-base text-muted-foreground">Search experts by skill, rate, and reviews to find the perfect match.</p>
+                            </div>
+                            <div className="p-4 sm:p-6 bg-card border md:hover:shadow-[8px_8px_0px_2px] md:hover:-translate-y-1 md:hover:-translate-x-1 transition-all duration-200 rounded-lg sm:col-span-2 lg:col-span-1">
+                                <h3 className="text-lg sm:text-xl font-semibold mb-2 text-foreground">Secure Payments</h3>
+                                <p className="text-sm sm:text-base text-muted-foreground">Pay safely with our escrow system and release funds upon satisfaction.</p>
+                            </div>
                         </div>
                     </div>
                 </section>

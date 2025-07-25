@@ -61,12 +61,12 @@ const Gigs: React.FC = () => {
 
     return (
         <Layout>
-            <div>
-                <div className="mb-6">
-                    <h1 className="text-2xl font-semibold mb-4">Browse Gigs</h1>
+            <div className="space-y-4 sm:space-y-6">
+                <div className="space-y-4 sm:space-y-6">
+                    <h1 className="text-xl sm:text-2xl font-semibold">Browse Gigs</h1>
 
                     {/* Search Bar */}
-                    <div className="relative max-w-2xl">
+                    <div className="relative w-full max-w-full sm:max-w-2xl">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <RiSearchLine className="h-4 w-4 text-muted-foreground" />
                         </div>
@@ -75,7 +75,7 @@ const Gigs: React.FC = () => {
                             placeholder="Search gigs by title, category, or freelancer..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="px-9"
+                            className="px-9 text-sm sm:text-base"
                         />
                         {searchTerm && (
                             <Button
@@ -91,7 +91,7 @@ const Gigs: React.FC = () => {
 
                     {/* Search Results Count */}
                     {searchTerm && !loading && (
-                        <p className="text-sm text-muted-foreground mt-2">
+                        <p className="text-xs sm:text-sm text-muted-foreground">
                             {filteredGigs.length} gig{filteredGigs.length !== 1 ? 's' : ''} found
                             {searchTerm && ` for "${searchTerm}"`}
                         </p>
@@ -99,18 +99,18 @@ const Gigs: React.FC = () => {
                 </div>
 
                 {loading ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                         {Array(8).fill(0).map((_, idx) => (
-                            <Skeleton key={idx} className="h-40 w-full rounded-lg" />
+                            <Skeleton key={idx} className="h-48 sm:h-52 w-full rounded-lg" />
                         ))}
                     </div>
                 ) : filteredGigs.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-12 min-h-[70vh] max-h-max">
+                    <div className="flex flex-col items-center justify-center py-12 max-h-max">
                         <RiSearchLine className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-foreground mb-2">
+                        <h3 className="text-base sm:text-lg font-medium text-foreground mb-2 text-center">
                             {searchTerm ? 'No gigs found' : 'No gigs available'}
                         </h3>
-                        <p className="text-muted-foreground">
+                        <p className="text-muted-foreground text-center px-4 text-sm sm:text-base">
                             {searchTerm
                                 ? `Try adjusting your search or browse all available gigs.`
                                 : 'Be the first to post a gig!'
@@ -121,6 +121,7 @@ const Gigs: React.FC = () => {
                                 variant="outline"
                                 onClick={handleClearSearch}
                                 className="mt-4"
+                                size="sm"
                             >
                                 Clear search
                             </Button>
@@ -128,26 +129,29 @@ const Gigs: React.FC = () => {
                     </div>
                 ) : (
                     <>
-                        <div className='min-h-[63vh] max-h-max'>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div className='max-h-max'>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                                 {paginatedGigs.map(gig => (
                                     <div
                                         key={gig._id}
                                         className="bg-card rounded-lg shadow hover:shadow-md transform hover:scale-101 overflow-hidden border cursor-pointer transition-all duration-200"
                                         onClick={() => handleGigClick(gig._id)}
                                     >
-                                        <img src={gig.imageURL} alt={gig.title} className="w-full h-40 object-cover " />
-                                        <div className="p-4">
-                                            <h3 className="text-lg font-semibold truncate">{gig.title}</h3>
-                                        <p className="text-sm text-muted-foreground truncate">
-                                            {typeof gig.category === 'string'
-                                                ? gig.category
-                                                : (gig.category as any)?.name ?? 'Uncategorized'
-                                            }
-                                        </p>
+                                        <img 
+                                            src={gig.imageURL} 
+                                            alt={gig.title} 
+                                            className="w-full h-32 sm:h-40 object-cover" 
+                                        />
+                                        <div className="p-3 sm:p-4">
+                                            <h3 className="text-base sm:text-lg font-semibold truncate">{gig.title}</h3>
+                                            <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                                                {typeof gig.category === 'string'
+                                                    ? gig.category
+                                                    : (gig.category as any)?.name ?? 'Uncategorized'
+                                                }
+                                            </p>
                                             <div className="mt-2 flex justify-between items-center">
-                                                <span className="text-sm font-medium">₹{gig.price}</span>
+                                                <span className="text-sm sm:text-base font-medium">₹{gig.price}</span>
                                                 <span className="text-xs text-muted-foreground">
                                                   By {gig.userId?.name ?? 'Unknown'}
                                                 </span>
@@ -158,23 +162,41 @@ const Gigs: React.FC = () => {
                             </div>
                         </div>
                         {/* Pagination Controls */}
-                        <div className="flex justify-center items-center space-x-2 mt-6">
-                            <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}>
+                        <div className="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-2 mt-6">
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                disabled={page === 1} 
+                                onClick={() => setPage(page - 1)}
+                                className="w-full sm:w-auto"
+                            >
                                 Previous
                             </Button>
-                            {Array(pageCount).fill(0).map((_, idx) => {
-                                const pageNum = idx + 1;
-                                return (
-                                    <button
-                                        key={pageNum}
-                                        className={`px-3 py-1 rounded ${page === pageNum ? 'bg-primary text-primary-foreground' : 'bg-card'} hover:bg-primary hover:text-primary-foreground`}
-                                        onClick={() => setPage(pageNum)}
-                                    >
-                                        {pageNum}
-                                    </button>
-                                );
-                            })}
-                            <Button variant="outline" size="sm" disabled={page === pageCount} onClick={() => setPage(page + 1)}>
+                            <div className="flex space-x-1 overflow-x-auto pb-2 sm:pb-0">
+                                {Array(pageCount).fill(0).map((_, idx) => {
+                                    const pageNum = idx + 1;
+                                    return (
+                                        <button
+                                            key={pageNum}
+                                            className={`px-3 py-1 rounded text-sm transition-colors ${
+                                                page === pageNum 
+                                                    ? 'bg-primary text-primary-foreground' 
+                                                    : 'bg-card hover:bg-primary hover:text-primary-foreground'
+                                            }`}
+                                            onClick={() => setPage(pageNum)}
+                                        >
+                                            {pageNum}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                disabled={page === pageCount} 
+                                onClick={() => setPage(page + 1)}
+                                className="w-full sm:w-auto"
+                            >
                                 Next
                             </Button>
                         </div>

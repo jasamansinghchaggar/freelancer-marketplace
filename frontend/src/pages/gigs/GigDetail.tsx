@@ -126,17 +126,17 @@ const GigDetail: React.FC = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="max-w-4xl mx-auto">
-          <Skeleton className="h-8 w-32 mb-6" />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <Skeleton className="h-6 sm:h-8 w-24 sm:w-32 mb-4 sm:mb-6" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             <div className="lg:col-span-2">
-              <Skeleton className="h-64 w-full mb-6 rounded-lg" />
-              <Skeleton className="h-8 w-3/4 mb-4" />
-              <Skeleton className="h-4 w-1/2 mb-6" />
-              <Skeleton className="h-32 w-full" />
+              <Skeleton className="h-48 sm:h-64 w-full mb-4 sm:mb-6 rounded-lg" />
+              <Skeleton className="h-6 sm:h-8 w-3/4 mb-3 sm:mb-4" />
+              <Skeleton className="h-4 w-1/2 mb-4 sm:mb-6" />
+              <Skeleton className="h-24 sm:h-32 w-full" />
             </div>
             <div className="lg:col-span-1">
-              <Skeleton className="h-64 w-full rounded-lg" />
+              <Skeleton className="h-64 sm:h-80 w-full rounded-lg" />
             </div>
           </div>
         </div>
@@ -147,10 +147,10 @@ const GigDetail: React.FC = () => {
   if (error || !gig) {
     return (
       <Layout>
-        <div className="max-w-4xl mx-auto text-center py-12">
-          <h1 className="text-2xl font-semibold mb-4">Gig Not Found</h1>
-          <p className="text-muted-foreground mb-6">{error || 'The requested gig could not be found.'}</p>
-          <Button onClick={handleBack} variant="outline">
+        <div className="max-w-4xl mx-auto text-center py-8 sm:py-12 px-4">
+          <h1 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">Gig Not Found</h1>
+          <p className="text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">{error || 'The requested gig could not be found.'}</p>
+          <Button onClick={handleBack} variant="outline" size="sm">
             <RiArrowLeftLine className="w-4 h-4 mr-2" />
             Back to Gigs
           </Button>
@@ -173,32 +173,33 @@ const GigDetail: React.FC = () => {
 
   return (
     <Layout>
-      <div className="max-w-full">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Back button */}
         <Button
           onClick={handleBack}
           variant="secondary"
-          className="mb-6"
+          className="mb-4 sm:mb-6"
+          size="sm"
         >
           <RiArrowLeftLine className="w-4 h-4 mr-2" />
           Back to Gigs
         </Button>
 
-        <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 pt-3">
-            <div className="mb-6">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div className="lg:col-span-2 order-2 lg:order-1">
+            <div className="mb-4 sm:mb-6">
               <img
                 src={gig.imageURL}
                 alt={gig.title}
-                className="w-full object-fit rounded-lg border"
+                className="w-full h-48 sm:h-64 lg:h-80 object-cover rounded-lg border"
               />
             </div>
 
             {/* Gig details */}
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold mb-2">{gig.title}</h1>
-              <div className="flex items-center text-sm text-muted-foreground mb-4">
-                <span className="bg-secondary px-2 py-1 rounded text-xs font-medium mr-3">
+            <div className="mb-4 sm:mb-6">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 sm:mb-3">{gig.title}</h1>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
+                <span className="bg-secondary px-2 py-1 rounded text-xs font-medium w-fit">
                   {(
                     typeof gig.category === 'string'
                       ? gig.category
@@ -213,10 +214,10 @@ const GigDetail: React.FC = () => {
             </div>
 
             {/* Description */}
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-3">Description</h2>
+            <div className="mb-6 sm:mb-8">
+              <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Description</h2>
               <div className="prose prose-sm max-w-none">
-                <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap text-sm sm:text-base">
                   {gig.desc}
                 </p>
               </div>
@@ -224,85 +225,89 @@ const GigDetail: React.FC = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-1 w-full">
-            <div className="bg-card border rounded-lg p-6 sticky top-24">
-              <div className="mb-6">
-                <div className="flex items-center text-2xl font-bold text-primary mb-2">
+          <div className="lg:col-span-1 order-1 lg:order-2">
+            <div className="bg-card border rounded-lg p-4 sm:p-6 lg:sticky lg:top-24">
+              <div className="mb-4 sm:mb-6">
+                <div className="flex items-center text-xl sm:text-2xl font-bold text-primary mb-1 sm:mb-2">
                   ₹{gig.price.toLocaleString()}
                 </div>
-                <p className="text-sm text-muted-foreground">Starting price</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Starting price</p>
               </div>
 
               {/* Freelancer info */}
-              <div className="mb-6 pb-6 border-b">
-                <h3 className="font-semibold mb-3">Freelancer</h3>
+              <div className="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b">
+                <h3 className="font-semibold mb-2 sm:mb-3 text-sm sm:text-base">Freelancer</h3>
                 <div className="flex items-center">
-                  <div className="w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs sm:text-sm font-medium">
                     {(gig.userId?.name?.charAt(0).toUpperCase()) ?? '?'}
                   </div>
-                  <div className='pl-2'>
-                    <p className="font-medium">{gig.userId?.name ?? 'Unknown'}</p>
-                    <p className="text-sm text-muted-foreground">{gig.userId?.email ?? ''}</p>
+                  <div className='pl-2 sm:pl-3'>
+                    <p className="font-medium text-sm sm:text-base">{gig.userId?.name ?? 'Unknown'}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground break-all">{gig.userId?.email ?? ''}</p>
                   </div>
                 </div>
               </div>
 
               {/* Action buttons and sales info */}
-              <div className="space-y-3 flex flex-col">
+              <div className="space-y-2 sm:space-y-3 flex flex-col">
                 {!isOwner ? (
                   <>
                     {!hasPurchased && (
                       <Button
                         onClick={handlepurchase}
-                        className="w-full"
-                        size="lg"
+                        className="w-full text-sm sm:text-base"
+                        size="default"
                       >
                         Purchase Gig
                       </Button>
                     )}
                     {hasPurchased && (
-                      <Button disabled className="w-full" size="lg">
+                      <Button disabled className="w-full text-sm sm:text-base" size="default">
                         Already Purchased
                       </Button>
                     )}
                     <Button
                       onClick={handleContact}
-                      className="w-full"
-                      size="lg"
+                      className="w-full text-sm sm:text-base"
+                      size="default"
                       variant="outline"
                     >
                       Contact Freelancer
                     </Button>
                   </>
                 ) : (
-                  <div className="text-center py-4 space-y-2">
-                    <p className="text-sm text-muted-foreground">This is your gig</p>
+                  <div className="text-center py-2 sm:py-4 space-y-2">
+                    <p className="text-xs sm:text-sm text-muted-foreground">This is your gig</p>
                     <Button
                       variant="outline"
-                      className="w-full"
+                      className="w-full text-sm sm:text-base"
                       onClick={() => navigate(`/gigs/${gig._id}/edit`)}
+                      size="sm"
                     >
                       Edit Gig
                     </Button>
                     <Button
                       variant="destructive"
-                      className="w-full"
+                      className="w-full text-sm sm:text-base"
                       onClick={handleDelete}
+                      size="sm"
                     >
                       Delete Gig
                     </Button>
                     {/* Show clients who purchased this gig */}
                     {clients.length > 0 && (
-                      <div className="mt-4 text-left">
-                        <h4 className="font-semibold mb-2">Clients who purchased this gig:</h4>
-                        <ul className="text-sm space-y-1">
-                          {clients.map((c, idx) => (
-                            <li key={idx} className="border-b last:border-b-0 pb-1">
-                              <span className="font-medium">{c.name}</span>
-                              {c.email && <span className="text-muted-foreground ml-2">({c.email})</span>}
-                            </li>
-                          ))}
-                        </ul>
+                      <div className="mt-3 sm:mt-4 text-left">
+                        <h4 className="font-semibold mb-2 text-sm">Clients who purchased this gig:</h4>
+                        <div className="max-h-32 overflow-y-auto">
+                          <ul className="text-xs sm:text-sm space-y-1">
+                            {clients.map((c, idx) => (
+                              <li key={idx} className="border-b last:border-b-0 pb-1">
+                                <span className="font-medium">{c.name}</span>
+                                {c.email && <span className="text-muted-foreground ml-1 sm:ml-2 break-all">({c.email})</span>}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
                     )}
                   </div>
