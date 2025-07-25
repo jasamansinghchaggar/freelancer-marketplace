@@ -1,11 +1,10 @@
 import { Request, Response } from "express";
-import { createUser, findUserByEmail } from "../services/user.service";
+import { createUser, findUserByEmail, updateUserProfile, getUserById } from "../services/user.service";
 import { signInSchema, signUpSchema } from "../validations/user.validation";
 import { signJwt } from "../utils/jwt";
 import { hashPassword, comparePassword } from "../utils/hashPassword";
 import { cookieOptions } from "../utils/cookieOptions";
 import { AuthenticatedRequest } from "../middlewares/user.middleware";
-import { getUserById } from "../services/user.service";
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -148,3 +147,35 @@ export const profile = async (req: AuthenticatedRequest, res: Response): Promise
         });
     }
 }
+// Update user name and email
+export const updateProfile = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+        const userId = req.user?.id;
+        const { name, email } = req.body;
+        if (!userId) {
+            res.status(401).json({ message: "Unauthorized access" });
+            return;
+        }
+        if (!name || !email) {
+            res.status(400).json({ message: "Name and email are required" });
+            return;
+        }
+        const updatedUser = await updateUserProfile(userId, { name, email });
+        if (!updatedUser) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+        res.status(200).json({
+            message: "Profile updated successfully",
+            user: {
+                id: updatedUser._id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                role: updatedUser.role,
+                profileCompleted: updatedUser.profileCompleted || false
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to update profile", error });
+    }
+};

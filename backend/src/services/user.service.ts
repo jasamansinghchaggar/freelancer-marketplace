@@ -5,7 +5,7 @@ export const getUserById = async (userId: string): Promise<IUser | null> => {
 };
 
 export const updateUserProfile = async (userId: string, updateData: Partial<IUser>): Promise<IUser | null> => {
-    return await User.findByIdAndUpdate(userId, updateData);
+    return await User.findByIdAndUpdate(userId, updateData, { new: true });
 };
 export const findOrCreateGoogleUser = async (profile: any): Promise<{ user: IUser, isFirstTime: boolean }> => {
     let user = await User.findOne({ googleId: profile.id });

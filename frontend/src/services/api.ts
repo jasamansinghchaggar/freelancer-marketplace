@@ -10,6 +10,8 @@ export const authAPI = {
     apiClient.post('/api/v1/user/signup', { name, email, password, role }),
 
   signOut: () => apiClient.get('/api/v1/user/signout'),
+  updateProfile: (data: { name: string; email: string }) =>
+    apiClient.put('/api/v1/user/profile', data),
 };
 
 export const profileAPI = {
