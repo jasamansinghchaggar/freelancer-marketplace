@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '../context/AuthContext';
+import { ModeToggle } from './mode-toggle';
 
 const Navbar: React.FC = () => {
     const { user } = useAuth();
@@ -19,6 +20,7 @@ const Navbar: React.FC = () => {
                 </Link>
 
                 <div className="flex items-center space-x-2 md:space-x-4">
+                    <ModeToggle />
                     {user ? (
                         <>
                             {user.role === 'freelancer' && (
