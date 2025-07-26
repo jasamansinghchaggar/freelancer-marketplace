@@ -4,15 +4,18 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { RiEditLine, RiCheckLine, RiCloseLine } from '@remixicon/react';
 import Layout from '@/components/Layout';
+import { Button } from '@/components/ui/button';
 
 const Profile: React.FC = () => {
     const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    // editing state
     const [isEditingName, setIsEditingName] = useState(false);
     const [isEditingEmail, setIsEditingEmail] = useState(false);
     const [editableName, setEditableName] = useState('');
     const [editableEmail, setEditableEmail] = useState('');
+    const [oldPassword, setOldPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
     useEffect(() => {
         authAPI.getProfile()
@@ -20,7 +23,6 @@ const Profile: React.FC = () => {
             .catch(console.error)
             .finally(() => setLoading(false));
     }, []);
-    // initialize editable fields when profile loads
     useEffect(() => {
         if (profile) {
             setEditableName(profile.name);
@@ -144,7 +146,57 @@ const Profile: React.FC = () => {
                     <label className="block text-sm font-medium mb-1">Role</label>
                     <Input className='w-full sm:max-w-xs lg:max-w-sm' value={profile.role} disabled />
                 </div>
+                <div className="pt-4 space-y-3">
+                    <label className="text-xl sm:text-2xl font-semibold">Change Password</label>
+                    <div className="pt-4 space-y-3">
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Old Password</label>
+                            <Input
+                                type="password"
+                                className="w-full sm:max-w-xs lg:max-w-sm"
+                                value={oldPassword}
+                                onChange={e => setOldPassword(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-1">New Password</label>
+                            <Input
+                                type="password"
+                                className="w-full sm:max-w-xs lg:max-w-sm"
+                                value={newPassword}
+                                onChange={e => setNewPassword(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Confirm New Password</label>
+                            <Input
+                                type="password"
+                                className="w-full sm:max-w-xs lg:max-w-sm"
+                                value={confirmPassword}
+                                onChange={e => setConfirmPassword(e.target.value)}
+                            />
+                        </div>
+                        <Button onClick={async () => {
+                            if (newPassword !== confirmPassword) {
+                                return alert('New passwords do not match');
+                            }
+                            try {
+                                await authAPI.changePassword(oldPassword, newPassword);
+                                alert('Password changed successfully');
+                                setOldPassword('');
+                                setNewPassword('');
+                                setConfirmPassword('');
+                            } catch (err) {
+                                console.error(err);
+                                alert('Failed to change password');
+                            }
+                        }}>
+                            Save Password
+                        </Button>
+                    </div>
+                </div>
             </div>
+
         </Layout>
     );
 };

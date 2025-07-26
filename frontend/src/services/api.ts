@@ -1,17 +1,21 @@
-import apiClient from '../utils/apiClient';
+import apiClient from "../utils/apiClient";
 
 export const authAPI = {
-  getProfile: () => apiClient.get('/api/v1/user/profile'),
+  getProfile: () => apiClient.get("/api/v1/user/profile"),
 
   signIn: (email: string, password: string) =>
-    apiClient.post('/api/v1/user/signin', { email, password }),
+    apiClient.post("/api/v1/user/signin", { email, password }),
 
   signUp: (name: string, email: string, password: string, role: string) =>
-    apiClient.post('/api/v1/user/signup', { name, email, password, role }),
+    apiClient.post("/api/v1/user/signup", { name, email, password, role }),
 
-  signOut: () => apiClient.get('/api/v1/user/signout'),
+  signOut: () => apiClient.get("/api/v1/user/signout"),
+
   updateProfile: (data: { name: string; email: string }) =>
-    apiClient.put('/api/v1/user/profile', data),
+    apiClient.put("/api/v1/user/profile", data),
+
+  changePassword: (oldPassword: string, newPassword: string) =>
+    apiClient.put("api/v1/user/change-password", { oldPassword, newPassword }),
 };
 
 export const profileAPI = {
@@ -20,29 +24,34 @@ export const profileAPI = {
     if (password) {
       data.password = password;
     }
-    return apiClient.post('/api/v1/profile/complete', data);
+    return apiClient.post("/api/v1/profile/complete", data);
   },
 
-  getProfileStatus: () => apiClient.get('/api/v1/profile/status'),
+  getProfileStatus: () => apiClient.get("/api/v1/profile/status"),
 };
 
 export const gigsAPI = {
-  getGigs: () => apiClient.get('/api/v1/gigs'),
+  getGigs: () => apiClient.get("/api/v1/gigs"),
 
   getGig: (id: string) => apiClient.get(`/api/v1/gigs/${id}`),
 
-  createGig: (gigData: any) => apiClient.post('/api/v1/gigs', gigData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  createGig: (gigData: any) =>
+    apiClient.post("/api/v1/gigs", gigData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
 
-  updateGig: (id: string, gigData: any) => apiClient.put(`/api/v1/gigs/${id}`, gigData),
+  updateGig: (id: string, gigData: any) =>
+    apiClient.put(`/api/v1/gigs/${id}`, gigData),
 
   deleteGig: (id: string) => apiClient.delete(`/api/v1/gigs/${id}`),
 };
 export const purchaseAPI = {
   purchaseGig: (gigId: string) => apiClient.post(`/api/v1/purchases/${gigId}`),
-  getClientPurchases: () => apiClient.get('/api/v1/purchases/client'),
-  getFreelancerPurchases: () => apiClient.get('/api/v1/purchases/freelancer'),
+  getClientPurchases: () => apiClient.get("/api/v1/purchases/client"),
+  getFreelancerPurchases: () => apiClient.get("/api/v1/purchases/freelancer"),
 };
 export const categoriesAPI = {
-  getCategories: () => apiClient.get('/api/v1/categories'),
-  createCategory: (name: string) => apiClient.post('/api/v1/categories', { name }),
+  getCategories: () => apiClient.get("/api/v1/categories"),
+  createCategory: (name: string) =>
+    apiClient.post("/api/v1/categories", { name }),
 };
