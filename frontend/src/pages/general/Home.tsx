@@ -64,7 +64,7 @@ const Home: React.FC = () => {
     } else {
       return [
         ...baseActions,
-        { icon: Award, label: 'My Purchases', onClick: () => navigate('/purchases'), color: 'bg-indigo-500' },
+        { icon: Award, label: 'My Purchases', onClick: () => navigate('/purchased-gigs'), color: 'bg-indigo-500' },
       ];
     }
   };

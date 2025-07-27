@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { authAPI } from '@/services/api';
+import { toast } from 'sonner';
 
 const GoogleCallback: React.FC = () => {
   const navigate = useNavigate();
@@ -10,6 +11,9 @@ const GoogleCallback: React.FC = () => {
   useEffect(() => {
     const handleGoogleCallback = async () => {
       try {
+        // Dismiss the loading toast from GoogleSignInButton
+        toast.dismiss('google-signin');
+        
         const error = searchParams.get('error');
         if (error) {
           console.error('Google Auth Error:', error);
@@ -21,11 +25,15 @@ const GoogleCallback: React.FC = () => {
         const userData = response.data;
         
         if (!userData.user.profileCompleted || userData.user.role === 'guest') {
+          toast.success('Signed in successfully! Please complete your profile.');
           navigate('/complete-profile');
         } else {
+          toast.success('Signed in successfully!');
           navigate('/home');
         }
       } catch (error: any) {
+        // Dismiss the loading toast in case of error too
+        toast.dismiss('google-signin');
         console.error('Callback handling error:', error);
         if (error.response?.status === 401) {
           navigate('/signin?error=auth_failed');

@@ -7,6 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
 import { RiArrowLeftLine } from '@remixicon/react';
+import { toast } from 'sonner';
 
 const SignUp: React.FC = () => {
   const [name, setName] = useState('');
@@ -32,11 +33,13 @@ const SignUp: React.FC = () => {
     setError('');
 
     if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
       setError('Passwords do not match');
       return;
     }
 
     if (password.length < 6) {
+      toast.error('Password must be at least 6 characters long');
       setError('Password must be at least 6 characters long');
       return;
     }
@@ -46,11 +49,14 @@ const SignUp: React.FC = () => {
     try {
       const success = await signup(name, email, password, role);
       if (success) {
+        toast.success('Account created successfully!');
         navigate('/home');
       } else {
+        toast.error('Failed to create account. Please try again.');
         setError('Failed to create account. Please try again.');
       }
     } catch (err) {
+      toast.error('An error occurred during signup');
       setError('An error occurred during signup');
     } finally {
       setLoading(false);

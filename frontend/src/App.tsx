@@ -21,6 +21,7 @@ import EditGig from './pages/gigs/EditGig';
 import PurchasedGigs from './pages/marketplace/PurchasedGigs';
 import Sales from './pages/marketplace/Sales';
 import { ThemeProvider } from './components/theme-provider';
+import { Toaster } from './components/ui/sonner';
 
 function App() {
   return (
@@ -125,6 +126,7 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
+          <Toaster />
         </Router>
       </AuthProvider>
     </ThemeProvider>

@@ -22,6 +22,7 @@ import {
   RiShoppingCartLine,
   RiMoneyRupeeCircleLine
 } from '@remixicon/react';
+import { toast } from 'sonner';
 
 const AppSidebar: React.FC = () => {
   const { user, signout } = useAuth();
@@ -30,6 +31,7 @@ const AppSidebar: React.FC = () => {
 
   const handleLogout = () => {
     signout();
+    toast.success('Logged out successfully!');
     navigate('/');
   };
 

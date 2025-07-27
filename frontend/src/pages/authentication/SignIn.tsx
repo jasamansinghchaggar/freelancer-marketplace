@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from 'lucide-react';
 import { RiArrowLeftLine } from '@remixicon/react';
+import { toast } from 'sonner';
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -28,16 +29,16 @@ const SignIn: React.FC = () => {
     if (urlError) {
       switch (urlError) {
         case 'google_auth_failed':
-          setError('Google authentication failed. Please try again.');
+          toast.error('Google authentication failed. Please try again.');
           break;
         case 'auth_failed':
-          setError('Authentication failed. Please try again.');
+          toast.error('Authentication failed. Please try again.');
           break;
         case 'callback_failed':
-          setError('Authentication callback failed. Please try again.');
+          toast.error('Authentication callback failed. Please try again.');
           break;
         default:
-          setError('An error occurred during authentication.');
+          toast.error('An error occurred during authentication.');
       }
     }
   }, [searchParams]);
@@ -50,11 +51,14 @@ const SignIn: React.FC = () => {
     try {
       const success = await signin(email, password);
       if (success) {
+        toast.success('Signed in successfully!');
         navigate('/home');
       } else {
+        toast.error('Invalid email or password');
         setError('Invalid email or password');
       }
     } catch (err) {
+      toast.error('An error occurred during login');
       setError('An error occurred during login');
     } finally {
       setLoading(false);

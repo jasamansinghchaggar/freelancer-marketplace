@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import Layout from '@/components/Layout';
 import { useAuth } from '@/context/AuthContext';
 import { RiArrowLeftLine, RiCalendarLine } from '@remixicon/react';
+import { toast } from 'sonner';
 
 interface Gig {
   _id: string;
@@ -108,10 +109,11 @@ const GigDetail: React.FC = () => {
     if (!confirmPurchase) return;
     try {
       await purchaseAPI.purchaseGig(gig._id);
+      toast.success('Gig purchased successfully!');
       navigate('/purchased-gigs');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Purchase failed:', err);
-      alert('Purchase failed. Please try again later.');
+      toast.error(err.response?.data?.message || 'Purchase failed. Please try again later.');
     }
   };
 

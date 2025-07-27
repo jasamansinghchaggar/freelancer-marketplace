@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { profileAPI } from '@/services/api';
+import { toast } from 'sonner';
 
 const CompleteProfile: React.FC = () => {
   const [role, setRole] = useState('client');
@@ -21,18 +22,21 @@ const CompleteProfile: React.FC = () => {
     setError('');
 
     if (!password) {
+      toast.error('Password is required');
       setError('Password is required');
       setLoading(false);
       return;
     }
 
     if (password.length < 6) {
+      toast.error('Password must be at least 6 characters long');
       setError('Password must be at least 6 characters long');
       setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
       setError('Passwords do not match');
       setLoading(false);
       return;
@@ -45,10 +49,12 @@ const CompleteProfile: React.FC = () => {
         updateUser(response.data.user);
       }
       
+      toast.success('Profile completed successfully!');
       navigate('/home');
 
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || err.response?.data?.message || 'Failed to complete profile';
+      toast.error(errorMessage);
       setError(errorMessage);
     } finally {
       setLoading(false);

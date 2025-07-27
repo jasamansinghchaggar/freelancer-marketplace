@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import ComboboxDemo from '@/components/combobox-demo';
+import { toast } from 'sonner';
 
 const EditGig: React.FC = () => {
   // State for category options
@@ -67,7 +68,7 @@ const EditGig: React.FC = () => {
         })
         .catch((error) => {
           console.error(error);
-          
+          toast.error('Failed to load gig data');
           navigate('/my-gigs')
         })
         .finally(() => setLoadingData(false));
@@ -99,9 +100,11 @@ const EditGig: React.FC = () => {
     }
     try {
       await gigsAPI.updateGig(id, formData);
+      toast.success('Gig updated successfully!');
       navigate('/my-gigs');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to update gig');
     } finally {
       setSubmitting(false);
     }

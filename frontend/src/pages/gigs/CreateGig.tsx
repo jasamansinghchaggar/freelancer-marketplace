@@ -7,6 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import Layout from '@/components/Layout';
 import ComboboxDemo from '@/components/combobox-demo';
 import { predefinedCategories } from '@/common/predefinedCategories';
+import { toast } from 'sonner';
 
 const CreateGig: React.FC = () => {
     const navigate = useNavigate();
@@ -77,9 +78,12 @@ const CreateGig: React.FC = () => {
             formData.append('category', category);
             if (file) formData.append('image', file);
             await gigsAPI.createGig(formData);
+            toast.success('Gig created successfully!');
             navigate('/gigs');
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Failed to create gig');
+            const errorMessage = err.response?.data?.message || 'Failed to create gig';
+            toast.error(errorMessage);
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { RiEditLine, RiCheckLine, RiCloseLine } from '@remixicon/react';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 const Profile: React.FC = () => {
     const [profile, setProfile] = useState<any>(null);
@@ -72,9 +73,10 @@ const Profile: React.FC = () => {
                                                 const res = await authAPI.updateProfile({ name: editableName, email: profile.email });
                                                 setProfile(res.data.user);
                                                 setIsEditingName(false);
-                                            } catch (err) {
+                                                toast.success('Name updated successfully!');
+                                            } catch (err: any) {
                                                 console.error(err);
-                                                alert('Failed to update name');
+                                                toast.error(err.response?.data?.message || 'Failed to update name');
                                             }
                                         }}
                                     />
@@ -117,9 +119,10 @@ const Profile: React.FC = () => {
                                                 const res = await authAPI.updateProfile({ name: profile.name, email: editableEmail });
                                                 setProfile(res.data.user);
                                                 setIsEditingEmail(false);
-                                            } catch (err) {
+                                                toast.success('Email updated successfully!');
+                                            } catch (err: any) {
                                                 console.error(err);
-                                                alert('Failed to update email');
+                                                toast.error(err.response?.data?.message || 'Failed to update email');
                                             }
                                         }}
                                     />
@@ -178,17 +181,18 @@ const Profile: React.FC = () => {
                         </div>
                         <Button onClick={async () => {
                             if (newPassword !== confirmPassword) {
-                                return alert('New passwords do not match');
+                                toast.error('New passwords do not match');
+                                return;
                             }
                             try {
                                 await authAPI.changePassword(oldPassword, newPassword);
-                                alert('Password changed successfully');
+                                toast.success('Password changed successfully!');
                                 setOldPassword('');
                                 setNewPassword('');
                                 setConfirmPassword('');
-                            } catch (err) {
+                            } catch (err: any) {
                                 console.error(err);
-                                alert('Failed to change password');
+                                toast.error(err.response?.data?.message || 'Failed to change password');
                             }
                         }}>
                             Save Password
