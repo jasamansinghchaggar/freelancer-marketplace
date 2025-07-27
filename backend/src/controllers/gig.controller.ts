@@ -20,40 +20,65 @@ export const createGig = async (req: MulterRequest, res: Response) => {
     try {
         const { title, desc, price, category: categoryName } = req.body;
         const userId = req.user?.id;
+        
         if (!userId) {
             return res.status(401).json({
                 error: 'Unauthorized'
             });
         }
+        
         if (!title || !desc || !price || !categoryName) {
             return res.status(400).json({
                 error: 'All fields (title, desc, price, category) are required'
             });
         }
+        
         if (!req.file) {
             return res.status(400).json({
                 error: 'Image is required'
             });
         }
 
-        const uploadResponse = await uploadImageToImageKit(req.file);
+        // Additional file validation
+        if (req.file.size > 10 * 1024 * 1024) {
+            return res.status(400).json({
+                error: 'File size too large. Maximum size is 10MB.'
+            });
+        }
 
-        const categoryDoc = await findOrCreateCategoryService(categoryName);
-        const categoryId = categoryDoc._id as unknown as Types.ObjectId;
-        const gig = await createGigService({
-            title,
-            desc,
-            price,
-            category: categoryId,
-            fileId: uploadResponse.fileId,
-            imageURL: uploadResponse.url,
-            userId: userId,
-        });
-        res.status(201).json(gig);
-    } catch (error) {
+        if (!req.file.mimetype.startsWith('image/')) {
+            return res.status(400).json({
+                error: 'Invalid file type. Only images are allowed.'
+            });
+        }
+
+        try {
+            const uploadResponse = await uploadImageToImageKit(req.file);
+            const categoryDoc = await findOrCreateCategoryService(categoryName);
+            const categoryId = categoryDoc._id as unknown as Types.ObjectId;
+            
+            const gig = await createGigService({
+                title,
+                desc,
+                price,
+                category: categoryId,
+                fileId: uploadResponse.fileId,
+                imageURL: uploadResponse.url,
+                userId: userId,
+            });
+            
+            res.status(201).json(gig);
+        } catch (uploadError: any) {
+            console.error('Upload error:', uploadError);
+            return res.status(500).json({
+                error: uploadError.message || 'Image upload failed'
+            });
+        }
+    } catch (error: any) {
+        console.error('Gig creation error:', error);
         res.status(500).json({
             message: "Gig creation failed",
-            error: error
+            error: error.message || 'Internal server error'
         });
     }
 };

@@ -10,6 +10,7 @@ import session from "express-session";
 import passport from "passport";
 import "./configs/passport.config";
 import { connectDb } from "./utils/connectDb";
+import { validateImageKitConfig } from "./utils/imageKit.utils";
 import userRoutes from "./routes/user.route";
 import gigsRouter from "./routes/gig.route";
 import authRoutes from "./routes/auth.route";
@@ -47,7 +48,6 @@ app.get("/", (req: Request, res: Response) => {
     });
 });
 
-
 app.use("/auth", authRoutes)
 app.use("/api/v1/gigs", gigsRouter)
 app.use("/api/v1/user", userRoutes)
@@ -58,6 +58,15 @@ app.use("/api/v1/purchases", purchaseRoutes);
 const startServer = async (): Promise<void> => {
     try {
         await connectDb();
+        
+        // Validate ImageKit configuration
+        if (!validateImageKitConfig()) {
+            console.warn("⚠️  ImageKit configuration is incomplete. Image uploads may fail.");
+            console.warn("Please ensure IMAGEKIT_PUBLIC_KEY, IMAGEKIT_PRIVATE_KEY, and IMAGEKIT_URL_ENDPOINT are set.");
+        } else {
+            console.log("✅ ImageKit configuration validated successfully");
+        }
+        
         app.listen(PORT, () => {
             console.log(`Server is running on ${BACKEND_URL}`)
         });

@@ -24,17 +24,21 @@ const Home: React.FC = () => {
 
         if (user?.role === 'client') {
           const purchases = await purchaseAPI.getClientPurchases();
-          setRecentActivity(purchases.data.slice(0, 5));
+          // Filter out purchases with null or undefined gigId
+          const validPurchases = purchases.data.filter((p: any) => p.gigId && p.gigId.price !== undefined);
+          setRecentActivity(validPurchases.slice(0, 5));
           setUserStats({
-            totalPurchases: purchases.data.length,
-            totalSpent: purchases.data.reduce((sum: number, p: any) => sum + p.gigId.price, 0)
+            totalPurchases: validPurchases.length,
+            totalSpent: validPurchases.reduce((sum: number, p: any) => sum + (p.gigId?.price || 0), 0)
           });
         } else if (user?.role === 'freelancer') {
           const sales = await purchaseAPI.getFreelancerPurchases();
-          setRecentActivity(sales.data.slice(0, 5));
+          // Filter out sales with null or undefined gigId
+          const validSales = sales.data.filter((s: any) => s.gigId && s.gigId.price !== undefined);
+          setRecentActivity(validSales.slice(0, 5));
           setUserStats({
-            totalSales: sales.data.length,
-            totalEarned: sales.data.reduce((sum: number, s: any) => sum + s.gigId.price, 0)
+            totalSales: validSales.length,
+            totalEarned: validSales.reduce((sum: number, s: any) => sum + (s.gigId?.price || 0), 0)
           });
         }
       } catch (error) {
@@ -176,10 +180,10 @@ const Home: React.FC = () => {
                     <div className="flex-1 min-w-0">
                       <p className="text-xs sm:text-sm font-medium truncate">
                         {user.role === 'freelancer' ? 'Sale: ' : 'Purchase: '}
-                        {activity.gigId?.title || 'Gig'}
+                        {activity.gigId?.title || 'Deleted Gig'}
                       </p>
                       <p className="text-xs text-muted-foreground flex items-center">
-                        <span className='text-sm'>₹</span>{activity.gigId.price} • {new Date(activity.createdAt).toLocaleDateString()}
+                        <span className='text-sm'>₹</span>{activity.gigId?.price || 0} • {new Date(activity.createdAt).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
