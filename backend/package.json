@@ -19,8 +19,7 @@
     "@types/express-session": "^1.18.2",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/passport": "^1.0.17",
-    "@types/passport-google-oauth20": "^2.0.16",
-    "typescript": "^5.8.3"
+    "@types/passport-google-oauth20": "^2.0.16"
   },
   "dependencies": {
     "@types/cors": "^2.8.19",
@@ -39,6 +38,7 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "sharp": "^0.34.3",
+    "typescript": "^5.8.3",
     "zod": "^3.25.76"
   }
 }
