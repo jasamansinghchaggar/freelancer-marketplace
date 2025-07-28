@@ -40,14 +40,19 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
 
     const hashedPassword = await hashPassword(password);
 
-    await createUser({ name, email, password: hashedPassword, role });
+    const newUser = await createUser({ name, email, password: hashedPassword, role, profileCompleted: true });
+
+    const token = signJwt({ id: newUser._id!.toString(), email: newUser.email });
+    res.cookie("token", token, cookieOptions);
 
     res.status(200).json({
       message: "signup successful",
       user: {
+        id: (newUser as any)._id,
         name,
         email,
         role,
+        profileCompleted: true,
       },
     });
   } catch (error) {
@@ -85,6 +90,7 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
               email: user.email,
               name: user.name,
               role: user.role,
+              profileCompleted: user.profileCompleted || false,
             },
           });
         } else {

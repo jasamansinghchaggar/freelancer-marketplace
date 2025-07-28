@@ -1,10 +1,12 @@
 import React from 'react';
 import { RiCopyrightLine, RiGithubLine, RiLinkedinLine, RiTwitterLine } from '@remixicon/react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
-  
+  const { user } = useAuth()
+
   return (
     <footer className="w-full bg-background border-t border-border mt-auto">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
@@ -19,27 +21,27 @@ const Footer: React.FC = () => {
               Connect talented freelancers with clients worldwide. Build your career or find the perfect talent for your next project.
             </p>
             <div className="flex space-x-3">
-              <a 
-                href="https://github.com" 
-                target="_blank" 
+              <a
+                href="https://github.com"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="GitHub"
               >
                 <RiGithubLine className="w-5 h-5" />
               </a>
-              <a 
-                href="https://linkedin.com" 
-                target="_blank" 
+              <a
+                href="https://linkedin.com"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="LinkedIn"
               >
                 <RiLinkedinLine className="w-5 h-5" />
               </a>
-              <a 
-                href="https://twitter.com" 
-                target="_blank" 
+              <a
+                href="https://twitter.com"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Twitter"
@@ -49,41 +51,41 @@ const Footer: React.FC = () => {
             </div>
           </div>
 
-          <div>
+          {user?.role === "freelancer" && <div>
             <h4 className="text-sm font-semibold text-foreground mb-3">
               For Freelancers
             </h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link to="/gigs" className="hover:text-foreground transition-colors">
-                  Browse Jobs
+                <Link to="/sales" className="hover:text-foreground transition-colors">
+                  Sales
                 </Link>
               </li>
               <li>
-                <Link to="/signup" className="hover:text-foreground transition-colors">
-                  Join as Freelancer
+                <Link to="/my-gigs" className="hover:text-foreground transition-colors">
+                  Services
                 </Link>
               </li>
             </ul>
-          </div>
+          </div>}
 
-          <div>
+          {user?.role === "client" && <div>
             <h4 className="text-sm font-semibold text-foreground mb-3">
               For Clients
             </h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link to="/gigs/new" className="hover:text-foreground transition-colors">
-                  Post a Job
+                <Link to="/purchased-gigs" className="hover:text-foreground transition-colors">
+                  Purchases
                 </Link>
               </li>
               <li>
-                <Link to="/signup" className="hover:text-foreground transition-colors">
+                <Link to="/gigs" className="hover:text-foreground transition-colors">
                   Hire Freelancers
                 </Link>
               </li>
             </ul>
-          </div>
+          </div>}
         </div>
 
         {/* Bottom bar */}
@@ -92,7 +94,7 @@ const Footer: React.FC = () => {
             <RiCopyrightLine className="w-4 h-4" />
             <span>{currentYear} Freelancer Marketplace. All rights reserved.</span>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-4.5 text-sm text-muted-foreground">
             <Link to="/privacy-policy" className="hover:text-foreground transition-colors">
               Privacy Policy
