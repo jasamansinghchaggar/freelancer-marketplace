@@ -35,6 +35,9 @@ function App() {
               <Route path="/signin" element={<SignIn />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/auth/google/callback" element={<GoogleCallback />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+              <Route path="/contact" element={<Contact />} />
               <Route
                 path="/complete-profile"
                 element={
@@ -83,9 +86,6 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
-              <Route path="/contact" element={<Contact />} />
               <Route path="/messages" element={
                 <ProtectedRoute>
                   <Messages />

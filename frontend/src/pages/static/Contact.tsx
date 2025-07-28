@@ -1,10 +1,12 @@
 import React from 'react';
-import Layout from '@/components/Layout';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 const Contact: React.FC = () => {
     return (
-        <Layout>
-            <div className="container mx-auto p-4">
+        <>
+            <Navbar />
+            <div className="h-[60vh] container mx-auto p-4">
                 <h1 className="text-2xl font-bold mb-4">Contact Us</h1>
                 <p>If you have any questions or feedback, please reach out to us at:</p>
                 <ul className="list-none list-inside">
@@ -17,7 +19,8 @@ const Contact: React.FC = () => {
                     <li><b>Phone: </b>+91 83829 37739</li>
                 </ul>
             </div>
-        </Layout>
+            <Footer />
+        </>
     );
 };
 
