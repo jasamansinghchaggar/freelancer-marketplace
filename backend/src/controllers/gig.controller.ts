@@ -23,21 +23,18 @@ export const createGig = async (req: MulterRequest, res: Response) => {
         const userId = req.user?.id;
         
         if (!userId) {
-            console.log('ERROR: No userId found');
             return res.status(401).json({
                 error: 'Unauthorized'
             });
         }
         
         if (!title || !desc || !price || !categoryName) {
-            console.log('ERROR: Missing required fields', { title, desc, price, categoryName });
             return res.status(400).json({
                 error: 'All fields (title, desc, price, category) are required'
             });
         }
         
         if (!req.file) {
-            console.log('ERROR: No file uploaded');
             return res.status(400).json({
                 error: 'Image is required'
             });

@@ -31,8 +31,6 @@ export const uploadImageToImageKit = async (file: Express.Multer.File) => {
       throw new Error(validationResult.error);
     }
 
-    console.log('Image validation passed:', validationResult.metadata);
-
     // Try uploading with basic quality compression
     try {
       const uploadResponse = await imageKit.upload({

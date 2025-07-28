@@ -15,10 +15,20 @@ async (
     done: (error: any, user?: any) => void
 ) => {
     try {
+        // Validate that we have the required profile data
+        if (!profile.emails || !profile.emails[0] || !profile.emails[0].value) {
+            return done(new Error('No email found in Google profile'), undefined);
+        }
+        
+        if (!profile.id) {
+            return done(new Error('No Google ID found in profile'), undefined);
+        }
+        
         const { user, isFirstTime } = await findOrCreateGoogleUser(profile);
         (user as any).isFirstTime = isFirstTime;
         return done(null, user);
     } catch (err) {
+        console.error('Google OAuth Strategy Error:', err);
         return done(err, undefined);
     }
 }

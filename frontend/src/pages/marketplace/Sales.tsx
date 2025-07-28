@@ -40,10 +40,7 @@ const Sales: React.FC = () => {
       })
       .catch(err => console.error(err))
       .finally(() => setLoading(false));
-  }, []);
-
-  console.log(sales);
-  
+  }, []);  
 
   if (loading) {
     return (
