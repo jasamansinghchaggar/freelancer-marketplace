@@ -21,7 +21,6 @@ import purchaseRoutes from "./routes/purchase.route";
 const app = express();
 
 const PORT = process.env.PORT as string;
-const BACKEND_URL = process.env.BACKEND_URL as string;
 
 app.use(cors({
     origin: process.env.FRONTEND_URL,
@@ -35,7 +34,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(session({
-    secret: process.env.SESSION_SECRET || "secret",
+    secret: process.env.SESSION_SECRET!,
     resave: false,
     saveUninitialized: false,
 }));
@@ -59,16 +58,14 @@ const startServer = async (): Promise<void> => {
     try {
         await connectDb();
         
-        // Validate ImageKit configuration
         if (!validateImageKitConfig()) {
-            console.warn("⚠️  ImageKit configuration is incomplete. Image uploads may fail.");
-            console.warn("Please ensure IMAGEKIT_PUBLIC_KEY, IMAGEKIT_PRIVATE_KEY, and IMAGEKIT_URL_ENDPOINT are set.");
+            console.warn("ImageKit configuration is incomplete. Image uploads may fail.");
         } else {
-            console.log("✅ ImageKit configuration validated successfully");
+            console.log("ImageKit configuration validated successfully");
         }
         
         app.listen(PORT, () => {
-            console.log(`Server is running on ${BACKEND_URL}`)
+            console.log(`Server started successfully`)
         });
     } catch (err) {
         console.error("Failed to connect to database. Server not started.");
