@@ -8,6 +8,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import passport from "passport";
+import cron from "node-cron";
+import axios from "axios";
 import "./configs/passport.config";
 import { connectDb } from "./utils/connectDb";
 import { validateImageKitConfig } from "./utils/imageKit.utils";
@@ -53,6 +55,19 @@ app.use("/api/v1/user", userRoutes)
 app.use("/api/v1/profile", profileRoutes)
 app.use("/api/v1/categories", categoryRoutes);
 app.use("/api/v1/purchases", purchaseRoutes);
+
+cron.schedule("*/5 * * * *", async () => {
+    try {
+        const response = await axios.get("https://freelancer-marketplace-ftq9.onrender.com");
+        console.log(`Health check: ${response.status}`);
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error("Health check failed:", error.message);
+        } else {
+            console.error("Health check failed:", error);
+        }
+    }
+});
 
 const startServer = async (): Promise<void> => {
     try {
