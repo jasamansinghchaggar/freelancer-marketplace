@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { authAPI } from '../services/api';
 
+const backendUrl = import.meta.env.VITE_API_BASE_URL
+
 interface User {
   id: string;
   email: string;
@@ -101,8 +103,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const loginWithGoogle = () => {
-    // Redirect to backend Google Auth endpoint
-    window.location.href = 'http://localhost:3000/auth/google';
+    window.location.href = `${backendUrl}/auth/google`;
   };
 
   const value = {
