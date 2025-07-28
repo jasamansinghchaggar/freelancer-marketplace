@@ -61,7 +61,7 @@ const Home: React.FC = () => {
 
     if (user?.role === 'freelancer') {
       return [
-        { icon: PlusCircle, label: 'Create Gig', onClick: () => navigate('/gigs/create'), color: 'bg-purple-500' },
+        { icon: PlusCircle, label: 'Create Gig', onClick: () => navigate('/gigs/new'), color: 'bg-purple-500' },
         ...baseActions,
         { icon: TrendingUp, label: 'My Sales', onClick: () => navigate('/sales'), color: 'bg-orange-500' },
       ];

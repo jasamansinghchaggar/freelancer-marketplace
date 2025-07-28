@@ -7,6 +7,7 @@ import {
     updateGigService,
     uploadImageToImageKit,
 } from '../services/gigs.service';
+import { validateImageWithPreset } from '../utils/imageValidation';
 import { findOrCreateCategoryService } from '../services/category.service';
 import { Types } from 'mongoose';
 import { AuthenticatedRequest } from '../middlewares/user.middleware';
@@ -22,18 +23,21 @@ export const createGig = async (req: MulterRequest, res: Response) => {
         const userId = req.user?.id;
         
         if (!userId) {
+            console.log('ERROR: No userId found');
             return res.status(401).json({
                 error: 'Unauthorized'
             });
         }
         
         if (!title || !desc || !price || !categoryName) {
+            console.log('ERROR: Missing required fields', { title, desc, price, categoryName });
             return res.status(400).json({
                 error: 'All fields (title, desc, price, category) are required'
             });
         }
         
         if (!req.file) {
+            console.log('ERROR: No file uploaded');
             return res.status(400).json({
                 error: 'Image is required'
             });
@@ -49,6 +53,15 @@ export const createGig = async (req: MulterRequest, res: Response) => {
         if (!req.file.mimetype.startsWith('image/')) {
             return res.status(400).json({
                 error: 'Invalid file type. Only images are allowed.'
+            });
+        }
+
+        // Validate image dimensions using Sharp with preset
+        const dimensionValidation = await validateImageWithPreset(req.file, 'gigImage');
+
+        if (!dimensionValidation.isValid) {
+            return res.status(400).json({
+                error: dimensionValidation.error
             });
         }
 
@@ -126,6 +139,15 @@ export const updateGig = async (req: MulterRequest, res: Response) => {
             updateData.category = categoryDoc._id;
         }
         if (req.file) {
+            // Validate image dimensions for update as well
+            const dimensionValidation = await validateImageWithPreset(req.file, 'gigImage');
+
+            if (!dimensionValidation.isValid) {
+                return res.status(400).json({
+                    error: dimensionValidation.error
+                });
+            }
+
             const uploadResponse = await uploadImageToImageKit(req.file);
             updateData.imageURL = uploadResponse.url;
             updateData.fileId = uploadResponse.fileId;

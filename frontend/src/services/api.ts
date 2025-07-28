@@ -15,7 +15,7 @@ export const authAPI = {
     apiClient.put("/api/v1/user/profile", data),
 
   changePassword: (oldPassword: string, newPassword: string) =>
-    apiClient.put("api/v1/user/change-password", { oldPassword, newPassword }),
+    apiClient.put("/api/v1/user/change-password", { oldPassword, newPassword }),
 };
 
 export const profileAPI = {
@@ -36,9 +36,7 @@ export const gigsAPI = {
   getGig: (id: string) => apiClient.get(`/api/v1/gigs/${id}`),
 
   createGig: (gigData: any) =>
-    apiClient.post("/api/v1/gigs", gigData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    }),
+    apiClient.post("/api/v1/gigs", gigData),
 
   updateGig: (id: string, gigData: any) =>
     apiClient.put(`/api/v1/gigs/${id}`, gigData),

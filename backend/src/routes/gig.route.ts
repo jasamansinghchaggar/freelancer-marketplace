@@ -26,6 +26,7 @@ const upload = multer({
 // Multer error handling middleware
 const handleMulterError = (err: any, req: any, res: any, next: any) => {
     if (err instanceof multer.MulterError) {
+        console.log('Multer error:', err.code, err.message);
         if (err.code === 'LIMIT_FILE_SIZE') {
             return res.status(400).json({
                 error: 'File too large. Maximum size is 10MB.'

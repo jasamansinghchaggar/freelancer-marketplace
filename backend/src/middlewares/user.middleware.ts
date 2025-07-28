@@ -11,6 +11,7 @@ export const userMiddleware = (req: AuthenticatedRequest, res: Response, next: N
     const token = req.cookies.token;    
 
     if (!token) {
+        console.log('ERROR: No token found in cookies');
         res.status(401).json({
             message: "Unauthorized access. No token provided."
         });
@@ -20,6 +21,7 @@ export const userMiddleware = (req: AuthenticatedRequest, res: Response, next: N
     const decoded = verifyJwt(token);
 
     if (decoded === null) {
+        console.log('ERROR: Invalid token');
         res.status(401).json({
             message: "Unauthorized access. Invalid token."
         });

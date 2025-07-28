@@ -2,6 +2,10 @@ import Gig from "../models/gig.model";
 import imageKit from "../configs/imageKit.config";
 import { Types } from "mongoose";
 import { getTransformedImageUrl, validateImageKitConfig } from "../utils/imageKit.utils";
+import { validateImageWithSharp, validateImageWithPreset } from "../utils/imageValidation";
+
+// Re-export for backward compatibility
+export const validateImageDimensions = validateImageWithSharp;
 
 export const uploadImageToImageKit = async (file: Express.Multer.File) => {
   try {
@@ -19,6 +23,15 @@ export const uploadImageToImageKit = async (file: Express.Multer.File) => {
     if (!file.mimetype.startsWith("image/")) {
       throw new Error("Invalid file type. Only images are allowed.");
     }
+
+    // Validate image dimensions using Sharp with preset
+    const validationResult = await validateImageWithPreset(file, 'gigImage');
+
+    if (!validationResult.isValid) {
+      throw new Error(validationResult.error);
+    }
+
+    console.log('Image validation passed:', validationResult.metadata);
 
     // Try uploading with basic quality compression
     try {

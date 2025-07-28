@@ -42,7 +42,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
 
     const newUser = await createUser({ name, email, password: hashedPassword, role, profileCompleted: true });
 
-    const token = signJwt({ id: newUser._id!.toString(), email: newUser.email });
+    const token = signJwt({ id: newUser._id!.toString(), email: newUser.email, role: newUser.role });
     res.cookie("token", token, cookieOptions);
 
     res.status(200).json({
@@ -82,7 +82,7 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
       if (user) {
         const isPasswordValid = await comparePassword(password, user.password);
         if (isPasswordValid) {
-          const token = signJwt({ id: user._id, email: user.email });
+          const token = signJwt({ id: user._id, email: user.email, role: user.role });
           res.cookie("token", token, cookieOptions);
           res.status(200).json({
             message: "signin successful",

@@ -160,7 +160,6 @@ const EditGig: React.FC = () => {
                 value={category}
                 onChange={async (val: string) => {
                   setCategory(val);
-                  // persist new category if not existing
                   if (!categories.some(c => c.value === val)) {
                     try { await categoriesAPI.createCategory(val); } catch { }
                     setCategories(prev => [...prev, { value: val, label: val }]);
