@@ -11,6 +11,8 @@ export interface IUser extends Document {
   role: UserRole;
   googleId?: string;
   profileCompleted?: boolean;
+  online: boolean;
+  lastSeen: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,6 +27,8 @@ const UserSchema: Schema = new Schema<IUser>(
     role: { type: String, enum: ["freelancer", "client", "guest"], required: true },
     googleId: { type: String, required: false, unique: true, sparse: true },
     profileCompleted: { type: Boolean, default: false },
+    online: { type: Boolean, default: false },
+    lastSeen: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );

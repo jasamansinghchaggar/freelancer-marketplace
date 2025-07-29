@@ -53,3 +53,15 @@ export const categoriesAPI = {
   createCategory: (name: string) =>
     apiClient.post("/api/v1/categories", { name }),
 };
+
+export const chatAPI = {
+  // Get all chats for the authenticated user
+  getChats: () => apiClient.get("/api/v1/chats"),
+  // Start or retrieve a one-to-one chat
+  startChat: (participantId: string) => apiClient.post("/api/v1/chats/start", { participantId }),
+  // Get messages for a specific chat
+  getMessages: (chatId: string) => apiClient.get(`/api/v1/chats/${chatId}/messages`),
+  // Send a message in a chat (Postman testing or UI)
+  sendMessage: (chatId: string, content: string, imageUrl?: string) =>
+    apiClient.post(`/api/v1/chats/${chatId}/messages`, { content, imageUrl }),
+};

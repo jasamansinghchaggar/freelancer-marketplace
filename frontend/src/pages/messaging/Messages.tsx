@@ -1,18 +1,96 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
+import { useAuth } from '@/context/AuthContext';
+import { chatAPI } from '@/services/api';
+import socket from '@/socket';
+import ChatList from '@/components/messaging/ChatList';
+import ChatWindow from '@/components/messaging/ChatWindow';
+import { useLocation } from 'react-router-dom';
 
 const Messages: React.FC = () => {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+  const [chats, setChats] = useState<any[]>([]);
+  const [selectedChat, setSelectedChat] = useState<any | null>(null);
+  
+  // Update chats and selectedChat on user status changes
+  useEffect(() => {
+    const handler = (data: { userId: string; online: boolean; lastSeen?: string }) => {
+      setChats((prevChats) =>
+        prevChats.map((chat) => ({
+          ...chat,
+          participants: chat.participants.map((p: any) =>
+            p._id === data.userId ? { ...p, online: data.online, lastSeen: data.lastSeen } : p
+          ),
+        }))
+      );
+      if (selectedChat) {
+        const updated = {
+          ...selectedChat,
+          participants: selectedChat.participants.map((p: any) =>
+            p._id === data.userId ? { ...p, online: data.online, lastSeen: data.lastSeen } : p
+          ),
+        };
+        setSelectedChat(updated);
+      }
+    };
+    socket.on('userStatus', handler);
+    return () => {
+      socket.off('userStatus', handler);
+    };
+  }, [selectedChat]);
+
+  useEffect(() => {
+    if (!loading) {
+      chatAPI.getChats().then((res) => setChats(res.data));
+    }
+  }, [loading]);
+
+  // Handle initial chat passed from navigation state (GigDetail) or via query param
+  useEffect(() => {
+    const state = (location.state as any) || {};
+    if (state.initialChat) {
+      const init = state.initialChat;
+      // add to list if not present
+      setChats((prev) => (prev.some((c) => c._id === init._id) ? prev : [...prev, init]));
+      setSelectedChat(init);
+      return;
+    }
+    const params = new URLSearchParams(location.search);
+    const chatId = params.get('chatId');
+    if (chatId && chats.length) {
+      const existing = chats.find((c) => c._id === chatId);
+      if (existing) {
+        setSelectedChat(existing);
+      }
+    }
+  }, [location.search, location.state, chats]);
+
+  if (loading) {
+    return (
+      <Layout>
+        <p>Loading...</p>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
-      <div className="space-y-4 sm:space-y-6">
-        <h1 className="text-xl sm:text-2xl font-bold">Messages</h1>
-        <div className="bg-card rounded-lg p-6 sm:p-8 border text-center">
-          <div className="max-w-md mx-auto">
-            <h3 className="text-lg font-medium text-foreground mb-2">Coming Soon</h3>
-            <p className="text-muted-foreground text-sm sm:text-base">
-              The messaging feature is currently under development. You'll be able to communicate with freelancers and clients directly through this interface.
-            </p>
-          </div>
+      <div className="flex h-[85vh] border rounded overflow-hidden">
+        <ChatList
+          chats={chats}
+          selectedChat={selectedChat}
+          onSelectChat={setSelectedChat}
+          currentUserId={user!.id}
+        />
+        <div className='flex w-full h-full'>
+          {selectedChat ? (
+            <ChatWindow chat={selectedChat} userId={user!.id} />
+          ) : (
+            <div className="flex w-full h-full items-center justify-center">
+              <p className="text-accent-foreground/50">Select a chat to start messaging</p>
+            </div>
+          )}
         </div>
       </div>
     </Layout>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { gigsAPI, purchaseAPI } from '@/services/api';
+import { gigsAPI, purchaseAPI, chatAPI } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import Layout from '@/components/Layout';
@@ -99,8 +99,15 @@ const GigDetail: React.FC = () => {
     navigate('/gigs');
   };
 
-  const handleContact = () => {
-    // TODO: Implement messaging/contact functionality
+  const handleContact = async () => {
+    if (!gig) return;
+    try {
+      // Start or retrieve a chat with this freelancer
+      const res = await chatAPI.startChat(gig.userId._id);
+      navigate(`/messages?chatId=${res.data._id}`, { state: { initialChat: res.data } });
+    } catch (err) {
+      console.error('Unable to start or retrieve chat:', err);
+    }
   };
 
   const handlepurchase = async () => {
