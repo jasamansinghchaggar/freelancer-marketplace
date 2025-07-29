@@ -89,8 +89,6 @@ const startServer = async (): Promise<void> => {
 
     // Socket.IO connection handling
     io.on("connection", (socket) => {
-      console.log("User connected:", socket.id);
-
       // Authenticate socket user via JWT from cookies
       const cookieHeader = socket.handshake.headers.cookie;
       if (cookieHeader) {
@@ -146,7 +144,6 @@ const startServer = async (): Promise<void> => {
       });
 
       socket.on("disconnect", () => {
-        console.log('User disconnected:', socket.id);
         const uid = socket.data.userId;
         if (uid) {
           const lastSeenDate = new Date();

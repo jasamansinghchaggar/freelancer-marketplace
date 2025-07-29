@@ -63,3 +63,54 @@ export const sendMessageRest = async (req: AuthenticatedRequest, res: Response) 
     res.status(500).json({ message: 'Failed to send message', error: err });
   }
 };
+// Update a message's content
+export const updateMessage = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { chatId, messageId } = req.params;
+    const { content } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(chatId) || !mongoose.Types.ObjectId.isValid(messageId)) {
+      return res.status(400).json({ message: 'Invalid chat or message ID' });
+    }
+    // find and update only if it belongs to this chat
+    const updated = await Message.findOneAndUpdate(
+      { _id: messageId, chatId },
+      { content },
+      { new: true }
+    ).exec();
+    if (!updated) {
+      return res.status(404).json({ message: 'Message not found' });
+    }
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to update message', error: err });
+  }
+};
+// Delete a single message
+export const deleteMessage = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { chatId, messageId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(chatId) || !mongoose.Types.ObjectId.isValid(messageId)) {
+      return res.status(400).json({ message: 'Invalid chat or message ID' });
+    }
+    const deleted = await Message.findOneAndDelete({ _id: messageId, chatId }).exec();
+    if (!deleted) {
+      return res.status(404).json({ message: 'Message not found' });
+    }
+    res.json({ message: 'Message deleted' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete message', error: err });
+  }
+};
+export const deleteChat = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { chatId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(chatId)) {
+      return res.status(400).json({ message: 'Invalid chat ID' });
+    }
+    await Message.deleteMany({ chatId: chatId });
+    await Chat.findByIdAndDelete(chatId);
+    res.json({ message: 'Chat deleted' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete chat', error: err });
+  }
+};

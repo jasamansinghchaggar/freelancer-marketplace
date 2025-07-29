@@ -35,8 +35,7 @@ export const gigsAPI = {
 
   getGig: (id: string) => apiClient.get(`/api/v1/gigs/${id}`),
 
-  createGig: (gigData: any) =>
-    apiClient.post("/api/v1/gigs", gigData),
+  createGig: (gigData: any) => apiClient.post("/api/v1/gigs", gigData),
 
   updateGig: (id: string, gigData: any) =>
     apiClient.put(`/api/v1/gigs/${id}`, gigData),
@@ -55,13 +54,16 @@ export const categoriesAPI = {
 };
 
 export const chatAPI = {
-  // Get all chats for the authenticated user
   getChats: () => apiClient.get("/api/v1/chats"),
-  // Start or retrieve a one-to-one chat
-  startChat: (participantId: string) => apiClient.post("/api/v1/chats/start", { participantId }),
-  // Get messages for a specific chat
-  getMessages: (chatId: string) => apiClient.get(`/api/v1/chats/${chatId}/messages`),
-  // Send a message in a chat (Postman testing or UI)
+  startChat: (participantId: string) =>
+    apiClient.post("/api/v1/chats/start", { participantId }),
+  deleteChat: (chatId: string) => apiClient.delete(`/api/v1/chats/${chatId}`),
+  getMessages: (chatId: string) =>
+    apiClient.get(`/api/v1/chats/${chatId}/messages`),
   sendMessage: (chatId: string, content: string, imageUrl?: string) =>
     apiClient.post(`/api/v1/chats/${chatId}/messages`, { content, imageUrl }),
+  updateMessage: (chatId: string, messageId: string, content: string) =>
+    apiClient.put(`/api/v1/chats/${chatId}/messages/${messageId}`, { content }),
+  deleteMessage: (chatId: string, messageId: string) =>
+    apiClient.delete(`/api/v1/chats/${chatId}/messages/${messageId}`),
 };

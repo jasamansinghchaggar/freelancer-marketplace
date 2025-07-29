@@ -22,12 +22,41 @@ import PurchasedGigs from './pages/marketplace/PurchasedGigs';
 import Sales from './pages/marketplace/Sales';
 import { ThemeProvider } from './components/theme-provider';
 import { Toaster } from './components/ui/sonner';
+import { toast } from 'sonner';
+import socket from './socket';
+import { chatAPI } from './services/api';
+import React, { useEffect, useState } from 'react';
+import { useAuth } from './context/AuthContext';
+
+const GlobalMessageListener: React.FC = () => {
+  const { user } = useAuth();
+  const [chats, setChats] = useState<any[]>([]); useEffect(() => {
+    if (!user) return; chatAPI.getChats()
+      .then((res) => {
+        setChats(res.data);
+        res.data.forEach((chat: any) => socket.emit('joinChat', chat._id));
+      })
+      .catch((err) => console.error('Failed to load or join chats:', err)); const handler = (msg: any) => {
+        if (msg.senderId !== user.id) {
+          const chat = chats.find((c) => c._id === msg.chatId);
+          const other = chat?.participants.find((p: any) => p._id === msg.senderId);
+          const name = other?.name || 'Someone';
+          toast.success(`New message from ${name}`, { description: msg.content });
+        }
+      };
+    socket.on('receiveMessage', handler);
+    return () => {
+      socket.off('receiveMessage', handler);
+    };
+  }, [user, chats]);
+  return null;
+};
 
 function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-
       <AuthProvider>
+        <GlobalMessageListener />
         <Router>
           <div className="min-h-screen no-scrollbar">
             <Routes>

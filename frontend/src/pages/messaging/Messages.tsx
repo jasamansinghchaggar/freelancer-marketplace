@@ -3,6 +3,7 @@ import Layout from '@/components/Layout';
 import { useAuth } from '@/context/AuthContext';
 import { chatAPI } from '@/services/api';
 import socket from '@/socket';
+import { toast } from 'sonner';
 import ChatList from '@/components/messaging/ChatList';
 import ChatWindow from '@/components/messaging/ChatWindow';
 import { useLocation } from 'react-router-dom';
@@ -12,7 +13,7 @@ const Messages: React.FC = () => {
   const location = useLocation();
   const [chats, setChats] = useState<any[]>([]);
   const [selectedChat, setSelectedChat] = useState<any | null>(null);
-  
+
   // Update chats and selectedChat on user status changes
   useEffect(() => {
     const handler = (data: { userId: string; online: boolean; lastSeen?: string }) => {
@@ -45,6 +46,23 @@ const Messages: React.FC = () => {
       chatAPI.getChats().then((res) => setChats(res.data));
     }
   }, [loading]);
+
+  // Notify when a message arrives for a non-active chat
+  useEffect(() => {
+    const handler = (msg: any) => {
+      const chatId = msg.chatId || msg.chat;
+      if (selectedChat?._id !== chatId) {
+        const chat = chats.find((c) => c._id === chatId);
+        const other = chat?.participants.find((p: any) => p._id !== user!.id);
+        const name = other?.name || 'Someone';
+        toast.success(`New message from ${name}`, { description: msg.content });
+      }
+    };
+    socket.on('receiveMessage', handler);
+    return () => {
+      socket.off('receiveMessage', handler);
+    };
+  }, [selectedChat, chats, user]);
 
   // Handle initial chat passed from navigation state (GigDetail) or via query param
   useEffect(() => {
@@ -81,6 +99,19 @@ const Messages: React.FC = () => {
           chats={chats}
           selectedChat={selectedChat}
           onSelectChat={setSelectedChat}
+          onDeleteChat={async (chatId) => {
+            if (confirm('Delete this chat?')) {
+              try {
+                await chatAPI.deleteChat(chatId);
+                setChats((prev) => prev.filter((c) => c._id !== chatId));
+                if (selectedChat?._id === chatId) setSelectedChat(null);
+                toast.success('Chat deleted');
+              } catch (err) {
+                console.error('Delete chat failed', err);
+                toast.error('Failed to delete chat');
+              }
+            }
+          }}
           currentUserId={user!.id}
         />
         <div className='flex w-full h-full'>
