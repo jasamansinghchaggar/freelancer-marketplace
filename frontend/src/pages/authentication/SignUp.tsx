@@ -24,7 +24,11 @@ const SignUp: React.FC = () => {
 
   React.useEffect(() => {
     if (user) {
-      navigate('/home');
+      if (user.profileCompleted) {
+        navigate('/home');
+      } else {
+        navigate('/complete-profile');
+      }
     }
   }, [user, navigate]);
 
@@ -50,7 +54,12 @@ const SignUp: React.FC = () => {
       const success = await signup(name, email, password, role);
       if (success) {
         toast.success('Account created successfully!');
-        navigate('/home');
+        // After signup, redirect based on profile completion
+        if (user?.profileCompleted) {
+          navigate('/home');
+        } else {
+          navigate('/complete-profile');
+        }
       } else {
         toast.error('Failed to create account. Please try again.');
         setError('Failed to create account. Please try again.');

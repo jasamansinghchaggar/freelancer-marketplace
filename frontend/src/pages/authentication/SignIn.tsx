@@ -20,7 +20,11 @@ const SignIn: React.FC = () => {
 
   React.useEffect(() => {
     if (user) {
-      navigate('/home');
+      if (user.profileCompleted) {
+        navigate('/home');
+      } else {
+        navigate('/complete-profile');
+      }
     }
   }, [user, navigate]);
 
@@ -52,7 +56,12 @@ const SignIn: React.FC = () => {
       const success = await signin(email, password);
       if (success) {
         toast.success('Signed in successfully!');
-        navigate('/home');
+        // Redirect based on profile completion
+        if (user?.profileCompleted) {
+          navigate('/home');
+        } else {
+          navigate('/complete-profile');
+        }
       } else {
         toast.error('Invalid email or password');
         setError('Invalid email or password');
