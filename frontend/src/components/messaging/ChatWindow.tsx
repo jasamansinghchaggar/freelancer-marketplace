@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { RiImageLine } from '@remixicon/react';
 import { chatAPI } from '@/services/api';
 import socket from '@/socket';
-import { RiPencilLine, RiDeleteBinLine, RiMore2Fill } from '@remixicon/react';
+import { RiPencilLine, RiDeleteBinLine, RiMore2Fill, RiCheckLine, RiCheckDoubleLine, RiCloseLine } from '@remixicon/react';
+import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from '../ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { Button } from '../ui/button';
 
 type Chat = {
     _id: string;
@@ -13,21 +16,27 @@ type Chat = {
         lastSeen?: string;
     }[];
 };
+// Define message including read status
 type Message = {
     _id: string;
     senderId: string;
     content?: string;
     imageUrl?: string;
     createdAt: string;
+    isRead: boolean;
+    // local status for ticks: 'sending', 'delivered', 'read'
+    status?: 'sending' | 'delivered' | 'read';
 };
 
 interface ChatWindowProps {
     chat: Chat;
     userId: string;
+    onClose: () => void;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ chat, userId }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ chat, userId, onClose }) => {
     const [messages, setMessages] = useState<Message[]>([]);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [newMessage, setNewMessage] = useState('');
     const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
     const [editingContent, setEditingContent] = useState<string>('');
@@ -35,10 +44,23 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chat, userId }) => {
 
     useEffect(() => {
         const chatId = chat._id;
-        chatAPI.getMessages(chatId).then((res) => setMessages(res.data));
+        // load existing messages, mark delivered/read based on isRead
+        chatAPI.getMessages(chatId).then((res) => {
+            const msgs = res.data.map((m: Message) => ({
+                ...m,
+                status: m.isRead ? 'read' : 'delivered'
+            }));
+            setMessages(msgs);
+        });
         socket.emit('joinChat', chatId);
         const receiveHandler = (msg: Message) => {
-            setMessages((prev) => [...prev, msg]);
+            setMessages((prev) => {
+                const filtered = prev.filter((m) => !m._id.startsWith('temp-'));
+                return [
+                    ...filtered,
+                    { ...msg, status: msg.isRead ? 'read' : 'delivered' }
+                ];
+            });
         };
         socket.on('receiveMessage', receiveHandler);
         return () => {
@@ -48,9 +70,30 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chat, userId }) => {
 
     const sendMessage = () => {
         const chatId = chat._id;
-        if (!newMessage.trim()) return;
-        socket.emit('sendMessage', { chatId, senderId: userId, content: newMessage });
+        const text = newMessage.trim();
+        if (!text) return;
+        const tempId = `temp-${Date.now()}`;
+        const tempMsg: Message = {
+            _id: tempId,
+            senderId: userId,
+            content: text,
+            imageUrl: undefined,
+            createdAt: new Date().toISOString(),
+            isRead: false,
+            status: 'sending'
+        };
+        setMessages((prev) => [...prev, tempMsg]);
+        socket.emit('sendMessage', { chatId, senderId: userId, content: text });
         setNewMessage('');
+    };
+    // Handle image file selection and upload
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        // upload image via API, socket will handle display
+        chatAPI.uploadImage(chat._id, file).catch(err => console.error('Image upload failed', err));
+        // reset input
+        if (fileInputRef.current) fileInputRef.current.value = '';
     };
     const other = chat.participants.find((u) => u._id !== userId);
     const otherName = other?.name || 'Unknown';
@@ -96,20 +139,76 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chat, userId }) => {
             console.error('Edit message failed', err);
         }
     };
-    // Delete a single message
-    const handleDeleteMessage = async (messageId: string) => {
-        if (confirm('Delete this message?')) {
-            try {
-                await chatAPI.deleteMessage(chat._id, messageId);
-                setMessages((prev) => prev.filter((m) => m._id !== messageId));
-            } catch (err) {
-                console.error('Delete message failed', err);
-            }
-        }
+    // Confirmation dialog state for deleting a message
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [msgToDelete, setMsgToDelete] = useState<string | null>(null);
+    const openDeleteDialog = (messageId: string) => {
+        setMsgToDelete(messageId);
+        setDeleteDialogOpen(true);
     };
+    const confirmDeleteMessage = async () => {
+        if (!msgToDelete) return;
+        try {
+            await chatAPI.deleteMessage(chat._id, msgToDelete);
+            setMessages((prev) => prev.filter((m) => m._id !== msgToDelete));
+        } catch (err) {
+            console.error('Delete message failed', err);
+        }
+        setDeleteDialogOpen(false);
+        setMsgToDelete(null);
+    };
+    // Typing indicator state and handler
+    const [otherTyping, setOtherTyping] = useState(false);
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    useEffect(() => {
+        const typingHandler = (data: { chatId: string; userId: string }) => {
+            if (data.chatId === chat._id && data.userId !== userId) {
+                setOtherTyping(true);
+                if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+                typingTimeoutRef.current = setTimeout(() => setOtherTyping(false), 2000);
+            }
+        };
+        socket.on('typing', typingHandler);
+        return () => {
+            socket.off('typing', typingHandler);
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+        };
+    }, [chat._id, userId]);
+    // Listen for read receipt acknowledgments
+    useEffect(() => {
+        const handleMessageRead = (data: { messageId: string }) => {
+            setMessages(prev => prev.map(m =>
+                m._id === data.messageId ? { ...m, status: 'read', isRead: true } : m
+            ));
+        };
+        socket.on('messageRead', handleMessageRead);
+        return () => { socket.off('messageRead', handleMessageRead); };
+    }, []);
+
+    // Emit read receipt for incoming messages
+    useEffect(() => {
+        messages.forEach(msg => {
+            if (msg.senderId !== userId && msg.status !== 'read') {
+                socket.emit('readMessage', { chatId: chat._id, messageId: msg._id });
+            }
+        });
+    }, [messages, chat._id, userId]);
 
     return (
         <div className="w-full h-full flex flex-col relative">
+            {/* Delete confirmation dialog */}
+            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Delete Message</DialogTitle>
+                    </DialogHeader>
+                    <DialogDescription>Are you sure you want to delete this message?</DialogDescription>
+                    <DialogFooter className="space-x-2">
+                        <Button variant={"outline"} onClick={() => { setDeleteDialogOpen(false); setMsgToDelete(null); }} className="px-4 py-2 rounded">Cancel</Button>
+                        <Button variant={"destructive"} onClick={confirmDeleteMessage} className="px-4 py-2 rounded">Delete</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
             <div className="absolute w-full top-0 border-b px-4 py-2 flex items-center justify-between z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                 <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
@@ -126,42 +225,54 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chat, userId }) => {
                         )}
                     </div>
                 </div>
+                <Button variant="ghost" onClick={onClose} className="p-2">
+                    <RiCloseLine size={20} />
+                </Button>
             </div>
             <div
                 ref={containerRef}
-                className="flex flex-col h-full overflow-y-auto p-4 pt-16 scrollbar-hide"
+                className="relative flex flex-col h-full overflow-y-auto p-4 pt-16 scrollbar-hide"
             >
-                {messages.map((msg) => (
-                    <div key={msg._id} className={`mb-2 relative group ${msg.senderId === userId ? 'text-right' : 'text-left'}`}>
-                        {editingMessageId === msg._id ? (
-                            <div>
-                                <input
-                                    className="w-full border rounded p-2 mb-1 outline-none"
-                                    value={editingContent}
-                                    onChange={(e) => setEditingContent(e.target.value)}
-                                />
-                                <div className="flex justify-end gap-2">
-                                    <button onClick={saveEdit} className="text-sm text-green-500">Save</button>
-                                    <button onClick={cancelEdit} className="text-sm text-red-500">Cancel</button>
+                {messages.map((msg, index) => {
+                    const msgDate = new Date(msg.createdAt).toDateString();
+                    const prevDate = index > 0 ? new Date(messages[index - 1].createdAt).toDateString() : null;
+                    return (
+                        <React.Fragment key={msg._id}>
+                            {/* Date separator */}
+                            {prevDate !== msgDate && (
+                                <div className="text-center text-xs text-gray-500 my-2">
+                                    {new Date(msg.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                                 </div>
-                            </div>
-                        ) : (
-                            <>
-                                <div className={`flex items-center ${msg.senderId === userId ? 'justify-end' : 'justify-start'}`}>
-                                    {msg.senderId === userId && (
-                                        <>
+                            )}
+                            {/* Message bubble */}
+                            <div className={`mb-2 relative group ${msg.senderId === userId ? 'text-right' : 'text-left'}`}>
+                                {editingMessageId === msg._id ? (
+                                    <div>
+                                        <input
+                                            className="w-full border rounded p-2 mb-1 outline-none"
+                                            value={editingContent}
+                                            onChange={(e) => setEditingContent(e.target.value)}
+                                        />
+                                        <div className="flex justify-end space-x-2">
+                                            <Button variant="outline" onClick={cancelEdit} className="px-4 py-2 rounded">Cancel</Button>
+                                            <Button onClick={saveEdit} className="px-4 py-2 rounded">Save</Button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className={`flex items-center ${msg.senderId === userId ? 'justify-end' : 'justify-start'}`}>
+                                        {msg.senderId === userId && (
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <RiMore2Fill size={16} />
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent className="w-24" align='start'>
+                                                <DropdownMenuContent className="w-24" align="start">
                                                     <DropdownMenuItem onClick={() => startEditing(msg)}>
                                                         Edit
                                                         <DropdownMenuShortcut>
                                                             <RiPencilLine />
                                                         </DropdownMenuShortcut>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem variant='destructive' onClick={() => handleDeleteMessage(msg._id)}>
+                                                    <DropdownMenuItem variant="destructive" onClick={() => openDeleteDialog(msg._id)}>
                                                         Delete
                                                         <DropdownMenuShortcut>
                                                             <RiDeleteBinLine />
@@ -169,37 +280,53 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chat, userId }) => {
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
-                                            {/* <button
-                                            onClick={() => startEditing(msg)}
-                                            className="text-xs text-accent hover:text-accent-foreground/20 mr-2"
-                                          >
-                                            <RiPencilLine />
-                                          </button>
-                                          <button
-                                            onClick={() => handleDeleteMessage(msg._id)}
-                                            className="text-xs text-red-500 hover:text-red-700 mr-2"
-                                          >
-                                            <RiDeleteBinLine />
-                                          </button> */}
-                                        </>
-                                    )}
-                                    <div className='flex items-end'>
-                                        <div className="inline-block p-2 rounded bg-accent">{msg.content}</div>
-                                        <div className="text-xs text-accent-foreground/50 inline-block ml-2">
-                                            {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hourCycle: 'h12' })}
+                                        )}
+                                        <div className="inline-flex items-end ml-2">
+                                            {msg.imageUrl ? (
+                                                <img src={msg.imageUrl} alt="Chat Image" className="inline-block max-w-xs rounded" />
+                                            ) : (
+                                                <div className="inline-block p-2 rounded bg-accent">{msg.content}</div>
+                                            )}
+                                            <div className="inline-flex items-center text-xs text-accent-foreground/50 ml-2 space-x-1">
+                                                {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hourCycle: 'h12' })}
+                                                {msg.senderId === userId && msg.status && (
+                                                    msg.status === 'sending' ? (
+                                                        <RiCheckLine size={12} className="ml-1 text-gray-400" />
+                                                    ) : (
+                                                        <RiCheckDoubleLine size={12} className={`${msg.status === 'read' ? 'text-blue-500' : 'text-gray-400'} ml-1`} />
+                                                    )
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </>
-                        )}
-                    </div>
-                ))}
+                                )}
+                            </div>
+                        </React.Fragment>
+                    );
+                })}
+                {otherTyping && (
+                    <span className="absolute bottom-0 left-0 p-2 text-xs text-accent-foreground/50 mr-2">Typing...</span>
+                )}
             </div>
-            <div className="p-4 border-t flex">
+            <div className="p-4 border-t flex items-center space-x-2">
                 <input
-                    className="flex-1 border rounded p-2 mr-2 outline-none"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    ref={fileInputRef}
+                    onChange={handleImageUpload}
+                    id="chat-image-upload"
+                />
+                <label htmlFor="chat-image-upload" className="cursor-pointer text-accent-foreground">
+                    <RiImageLine size={24} />
+                </label>
+                <input
+                    className="flex-1 border rounded p-2 outline-none"
                     value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
+                    onChange={(e) => {
+                        setNewMessage(e.target.value);
+                        socket.emit('typing', { chatId: chat._id, senderId: userId });
+                    }}
                     placeholder="Type a message..."
                 />
                 <button onClick={sendMessage} className="px-4 py-2 bg-accent">

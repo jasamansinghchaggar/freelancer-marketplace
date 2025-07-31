@@ -9,10 +9,6 @@ export const signJwt = (payload: Record<string, string>): string => {
 };
 
 export const verifyJwt = (token: string): any => {
-    try {
-        return jwt.verify(token, JWT_SECRET) as Record<string, any>;
-    } catch (error) {
-        console.error("JWT verification failed:", error);
-        return null;
-    }
+    // Throws if token is invalid or expired, allowing callers to handle specific errors
+    return jwt.verify(token, JWT_SECRET) as Record<string, any>;
 };

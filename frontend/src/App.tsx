@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { UnreadProvider } from './context/UnreadContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import SignIn from './pages/authentication/SignIn';
 import SignUp from './pages/authentication/SignUp';
@@ -56,8 +57,9 @@ function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <AuthProvider>
-        <GlobalMessageListener />
-        <Router>
+        <UnreadProvider>
+          <GlobalMessageListener />
+          <Router>
           <div className="min-h-screen no-scrollbar">
             <Routes>
               <Route path="/" element={<LandingPage />} />
@@ -157,6 +159,7 @@ function App() {
           </div>
           <Toaster />
         </Router>
+        </UnreadProvider>
       </AuthProvider>
     </ThemeProvider>
   );

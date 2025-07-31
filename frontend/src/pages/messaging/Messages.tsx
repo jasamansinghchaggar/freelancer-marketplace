@@ -6,10 +6,12 @@ import socket from '@/socket';
 import { toast } from 'sonner';
 import ChatList from '@/components/messaging/ChatList';
 import ChatWindow from '@/components/messaging/ChatWindow';
+import { useUnread } from '@/context/UnreadContext';
 import { useLocation } from 'react-router-dom';
 
 const Messages: React.FC = () => {
   const { user, loading } = useAuth();
+  const { addUnread } = useUnread();
   const location = useLocation();
   const [chats, setChats] = useState<any[]>([]);
   const [selectedChat, setSelectedChat] = useState<any | null>(null);
@@ -52,6 +54,8 @@ const Messages: React.FC = () => {
     const handler = (msg: any) => {
       const chatId = msg.chatId || msg.chat;
       if (selectedChat?._id !== chatId) {
+        // mark chat as unread and notify
+        addUnread(chatId);
         const chat = chats.find((c) => c._id === chatId);
         const other = chat?.participants.find((p: any) => p._id !== user!.id);
         const name = other?.name || 'Someone';
@@ -116,7 +120,11 @@ const Messages: React.FC = () => {
         />
         <div className='flex w-full h-full'>
           {selectedChat ? (
-            <ChatWindow chat={selectedChat} userId={user!.id} />
+            <ChatWindow
+              chat={selectedChat}
+              userId={user!.id}
+              onClose={() => setSelectedChat(null)}
+            />
           ) : (
             <div className="flex w-full h-full items-center justify-center">
               <p className="text-accent-foreground/50">Select a chat to start messaging</p>

@@ -35,6 +35,8 @@ const io = new SocketIOServer(httpServer, {
     credentials: true,
   },
 });
+// Expose io instance to controllers via app locals
+app.set('io', io);
 
 const PORT = process.env.PORT as string;
 
@@ -97,22 +99,36 @@ const startServer = async (): Promise<void> => {
           .map((c) => c.trim())
           .find((c) => c.startsWith('token='))
           ?.split('=')[1];
-      if (token) {
-        const decoded = verifyJwt(token);
-        if (decoded && decoded.id) {
-          const userId = decoded.id;
-          // mark user online
-          User.findByIdAndUpdate(userId, { online: true }).exec();
-          // broadcast status
-          io.emit('userStatus', { userId, online: true, lastSeen: null });
-          // attach to socket for disconnect handling
-          socket.data.userId = userId;
+        if (token) {
+          try {
+            const decoded = verifyJwt(token);
+            if (decoded && decoded.id) {
+              const userId = decoded.id;
+              // mark user online
+              User.findByIdAndUpdate(userId, { online: true }).exec();
+              // broadcast status
+              io.emit('userStatus', { userId, online: true, lastSeen: null });
+              // attach to socket for disconnect handling
+              socket.data.userId = userId;
+            }
+          } catch (error: any) {
+            if (error.name === 'TokenExpiredError') {
+              console.warn('Socket authentication failed: token expired');
+            } else {
+              console.error('Socket authentication error:', error);
+            }
+          }
         }
-      }
       }
 
       socket.on("joinChat", (chatId: string) => {
         socket.join(chatId);
+      });
+      // Handle typing indicator
+      socket.on("typing", (data: { chatId: string; senderId: string }) => {
+        const { chatId, senderId } = data;
+        // broadcast typing to other participants in the chat
+        socket.to(chatId).emit('typing', { chatId, userId: senderId });
       });
 
       socket.on("sendMessage", async (data) => {
@@ -151,6 +167,18 @@ const startServer = async (): Promise<void> => {
           User.findByIdAndUpdate(uid, { online: false, lastSeen: lastSeenDate }).exec();
           // broadcast status
           io.emit('userStatus', { userId: uid, online: false, lastSeen: lastSeenDate });
+        }
+      });
+      // Handle read receipts
+      socket.on("readMessage", async (data: { chatId: string; messageId: string }) => {
+        try {
+          const { chatId, messageId } = data;
+          // mark message as read
+          await Message.findByIdAndUpdate(messageId, { isRead: true }).exec();
+          // notify participants
+          io.to(chatId).emit('messageRead', { messageId });
+        } catch (err) {
+          console.error('Error handling read receipt', err);
         }
       });
     });

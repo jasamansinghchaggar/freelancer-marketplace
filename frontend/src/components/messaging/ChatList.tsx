@@ -6,6 +6,7 @@ import {
     DropdownMenuItem,
     DropdownMenuShortcut
 } from '../ui/dropdown-menu';
+import { useUnread } from '../../context/UnreadContext';
 import { RiDeleteBinLine, RiMore2Fill } from '@remixicon/react';
 
 type Chat = {
@@ -33,6 +34,7 @@ interface ChatListProps {
 
 const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelectChat, currentUserId, onDeleteChat }) => {
     const [searchTerm, setSearchTerm] = useState('');
+    const { unreadChats, clearUnread } = useUnread();
 
     const filtered = chats.filter(chat => {
         const other = chat.participants.find(u => u._id !== currentUserId);
@@ -62,8 +64,11 @@ const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelectChat, 
                     return (
                         <div
                             key={chat._id}
-                            onClick={() => onSelectChat(chat)}
+                            onClick={() => { clearUnread(chat._id); onSelectChat(chat); }}
                             className={`relative group p-4 hover:bg-accent cursor-pointer ${isSelected ? 'bg-accent' : ''} flex flex-row-reverse w-full items-center gap-2`}>
+                            {unreadChats.has(chat._id) && (
+                                <span className="absolute left-4 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-red-600 rounded-full z-20" />
+                            )}
                             <div className="flex flex-col w-full">
                                 <p className="text-md font-bold text-accent-foreground">{name}</p>
                                 <div className='flex items-center justify-between'>

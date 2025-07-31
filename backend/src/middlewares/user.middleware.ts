@@ -20,24 +20,22 @@ export const userMiddleware = (req: AuthenticatedRequest, res: Response, next: N
 
     try {
         const decoded = verifyJwt(token);
-
-        if (decoded === null) {
-            res.status(401).json({
-                message: "Unauthorized access. Invalid token."
-            });
-            return;
-        }
-
+        // Token is valid and not expired
         req.user = {
             id: new mongoose.Types.ObjectId(decoded.id),
             role: decoded.role,
         };
         next();
-    } catch (error) {
+    } catch (error: any) {
+        // Handle expired token separately
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json({
+                message: "Unauthorized access. Token expired."
+            });
+        }
         console.error('JWT verification error:', error);
-        res.status(401).json({
-            message: "Unauthorized access. Token verification failed."
+        return res.status(401).json({
+            message: "Unauthorized access. Invalid token."
         });
-        return;
     }
 };

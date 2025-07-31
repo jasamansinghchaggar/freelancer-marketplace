@@ -66,4 +66,12 @@ export const chatAPI = {
     apiClient.put(`/api/v1/chats/${chatId}/messages/${messageId}`, { content }),
   deleteMessage: (chatId: string, messageId: string) =>
     apiClient.delete(`/api/v1/chats/${chatId}/messages/${messageId}`),
+  // Upload an image file to chat
+  uploadImage: (chatId: string, file: File) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    return apiClient.post(`/api/v1/chats/${chatId}/upload`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
 };

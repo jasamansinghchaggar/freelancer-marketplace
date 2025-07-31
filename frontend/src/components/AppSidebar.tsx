@@ -23,9 +23,11 @@ import {
   RiMoneyRupeeCircleLine
 } from '@remixicon/react';
 import { toast } from 'sonner';
+import { useUnread } from '@/context/UnreadContext';
 
 const AppSidebar: React.FC = () => {
   const { user, signout } = useAuth();
+  const { unreadChats } = useUnread();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -56,27 +58,27 @@ const AppSidebar: React.FC = () => {
 
   const roleBasedItems = user?.role === 'freelancer'
     ? [
-        {
-          title: 'Sales',
-          icon: RiMoneyRupeeCircleLine,
-          path: '/sales',
-          onClick: () => navigate('/sales'),
-        },
-        {
-          title: 'Create Gig',
-          icon: RiAddBoxLine,
-          path: '/gigs/new',
-          onClick: () => navigate('/gigs/new'),
-        },
-        {
-          title: 'My Gigs',
-          icon: RiBriefcase4Line,
-          path: '/my-gigs',
-          onClick: () => navigate('/my-gigs'),
-        },
-      ]
+      {
+        title: 'Sales',
+        icon: RiMoneyRupeeCircleLine,
+        path: '/sales',
+        onClick: () => navigate('/sales'),
+      },
+      {
+        title: 'Create Gig',
+        icon: RiAddBoxLine,
+        path: '/gigs/new',
+        onClick: () => navigate('/gigs/new'),
+      },
+      {
+        title: 'My Gigs',
+        icon: RiBriefcase4Line,
+        path: '/my-gigs',
+        onClick: () => navigate('/my-gigs'),
+      },
+    ]
     : user?.role === 'client'
-    ? [
+      ? [
         {
           title: 'Purchased Gigs',
           icon: RiShoppingCartLine,
@@ -84,7 +86,7 @@ const AppSidebar: React.FC = () => {
           onClick: () => navigate('/purchased-gigs'),
         },
       ]
-    : [];
+      : [];
 
   const accountItems = [
     {
@@ -116,8 +118,8 @@ const AppSidebar: React.FC = () => {
                   <SidebarMenuButton
                     onClick={item.onClick}
                     className={`transition-colors ${isActive(item.path)
-                        ? 'bg-accent text-accent-foreground'
-                        : 'hover:bg-accent/50'
+                      ? 'bg-accent text-accent-foreground'
+                      : 'hover:bg-accent/50'
                       }`}
                   >
                     <item.icon className="w-4 h-4" />
@@ -142,8 +144,8 @@ const AppSidebar: React.FC = () => {
                     <SidebarMenuButton
                       onClick={item.onClick}
                       className={`transition-colors ${isActive(item.path)
-                          ? 'bg-accent text-accent-foreground'
-                          : 'hover:bg-accent/50'
+                        ? 'bg-accent text-accent-foreground'
+                        : 'hover:bg-accent/50'
                         }`}
                     >
                       <item.icon className="w-4 h-4" />
@@ -167,13 +169,16 @@ const AppSidebar: React.FC = () => {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     onClick={item.onClick}
-                    className={`transition-colors ${isActive(item.path)
-                        ? 'bg-accent text-accent-foreground'
-                        : 'hover:bg-accent/50'
+                    className={`transition-colors relative ${isActive(item.path)
+                      ? 'bg-accent text-accent-foreground'
+                      : 'hover:bg-accent/50'
                       }`}
                   >
                     <item.icon className="w-4 h-4" />
-                    <span>{item.title}</span>
+                    <span className="ml-2">{item.title}</span>
+                    {item.title === 'Messages' && unreadChats.size > 0 && (
+                      <span className="absolute top-1/2 right-3 transform -translate-y-1/2 w-3 h-3 bg-red-600 rounded-full z-20" />
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
