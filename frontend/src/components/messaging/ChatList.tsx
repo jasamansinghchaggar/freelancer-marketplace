@@ -8,6 +8,7 @@ import {
 } from '../ui/dropdown-menu';
 import { useUnread } from '../../context/UnreadContext';
 import { RiDeleteBinLine, RiMore2Fill } from '@remixicon/react';
+import { Link } from 'react-router-dom';
 
 type Chat = {
     _id: string;
@@ -44,7 +45,10 @@ const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelectChat, 
     });
     return (
         <div className="w-1/3 border-r overflow-y-auto">
-            <h2 className="p-4 font-semibold">Chats</h2>
+            <div className='flex items-center justify-between'>
+                <h2 className="p-4 font-semibold">Chats</h2>
+                <Link className='p-4 font-semibold underline underline-offset-2' to={"/"}>Back</Link>
+            </div>
             <div className="px-4 mb-2">
                 <input
                     type="text"

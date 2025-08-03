@@ -283,7 +283,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chat, userId, onClose }) => {
                                         )}
                                         <div className="inline-flex items-end ml-2">
                                             {msg.imageUrl ? (
-                                                <img src={msg.imageUrl} alt="Chat Image" className="inline-block max-w-xs rounded" />
+                                                <img src={msg.imageUrl} alt="Chat Image" className="inline-block max-w-full md:max-w-xs rounded" />
                                             ) : (
                                                 <div className="inline-block p-2 rounded bg-accent">{msg.content}</div>
                                             )}
@@ -326,6 +326,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chat, userId, onClose }) => {
                     onChange={(e) => {
                         setNewMessage(e.target.value);
                         socket.emit('typing', { chatId: chat._id, senderId: userId });
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            sendMessage();
+                        }
                     }}
                     placeholder="Type a message..."
                 />

@@ -125,6 +125,13 @@ const SignIn: React.FC = () => {
             </div>
           </div>
 
+          {/* Forgot password link */}
+          <div className="text-right">
+            <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+              Forgot password?
+            </Link>
+          </div>
+
           {error && (
             <div className="bg-destructive/10 text-destructive px-3 py-3 rounded-lg border border-destructive/30 text-xs sm:text-sm text-center">
               {error}

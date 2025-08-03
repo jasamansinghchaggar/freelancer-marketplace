@@ -10,6 +10,10 @@ export const authAPI = {
     apiClient.post("/api/v1/user/signup", { name, email, password, role }),
 
   signOut: () => apiClient.get("/api/v1/user/signout"),
+  forgotPassword: (email: string) =>
+    apiClient.post("/auth/forgot-password", { email }),
+  resetPassword: (token: string, password: string) =>
+    apiClient.post("/auth/reset-password", { token, password }),
 
   updateProfile: (data: { name: string; email: string }) =>
     apiClient.put("/api/v1/user/profile", data),

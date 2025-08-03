@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Layout from '@/components/Layout';
 import { useAuth } from '@/context/AuthContext';
 import { chatAPI } from '@/services/api';
 import socket from '@/socket';
@@ -8,6 +7,9 @@ import ChatList from '@/components/messaging/ChatList';
 import ChatWindow from '@/components/messaging/ChatWindow';
 import { useUnread } from '@/context/UnreadContext';
 import { useLocation } from 'react-router-dom';
+import Navbar from '@/components/Navbar';
+import { useIsMobile } from '@/hooks/use-mobile';
+
 
 const Messages: React.FC = () => {
   const { user, loading } = useAuth();
@@ -15,6 +17,7 @@ const Messages: React.FC = () => {
   const location = useLocation();
   const [chats, setChats] = useState<any[]>([]);
   const [selectedChat, setSelectedChat] = useState<any | null>(null);
+  const isMobile = useIsMobile();
 
   // Update chats and selectedChat on user status changes
   useEffect(() => {
@@ -90,50 +93,98 @@ const Messages: React.FC = () => {
 
   if (loading) {
     return (
-      <Layout>
-        <p>Loading...</p>
-      </Layout>
+      <div className="flex h-[85vh] w-full animate-pulse">
+        {/* Chat list skeleton */}
+        <div className="w-1/4 bg-gray-200 dark:bg-gray-700 p-4 space-y-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-8 bg-gray-300 dark:bg-gray-600 rounded" />
+          ))}
+        </div>
+        {/* Chat window skeleton */}
+        <div className="flex-1 bg-gray-200 dark:bg-gray-700 p-4 space-y-4">
+          <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-1/3" />
+          <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-2/3" />
+          <div className="h-full bg-gray-300 dark:bg-gray-600 rounded" />
+        </div>
+      </div>
     );
   }
 
   return (
-    <Layout>
-      <div className="flex h-[85vh] border rounded overflow-hidden">
-        <ChatList
-          chats={chats}
-          selectedChat={selectedChat}
-          onSelectChat={setSelectedChat}
-          onDeleteChat={async (chatId) => {
-            if (confirm('Delete this chat?')) {
-              try {
-                await chatAPI.deleteChat(chatId);
-                setChats((prev) => prev.filter((c) => c._id !== chatId));
-                if (selectedChat?._id === chatId) setSelectedChat(null);
-                toast.success('Chat deleted');
-              } catch (err) {
-                console.error('Delete chat failed', err);
-                toast.error('Failed to delete chat');
-              }
-            }
-          }}
-          currentUserId={user!.id}
-        />
-        <div className='flex w-full h-full'>
-          {selectedChat ? (
-            <ChatWindow
-              chat={selectedChat}
-              userId={user!.id}
-              onClose={() => setSelectedChat(null)}
+    <div className='flex flex-col h-screen'>
+      <Navbar />
+      {/* Mobile/tablet view: show only chat list or chat window */}
+      {isMobile ? (
+        <div className="flex h-full rounded overflow-hidden">
+          {!selectedChat ? (
+            <ChatList
+              chats={chats}
+              selectedChat={selectedChat}
+              onSelectChat={setSelectedChat}
+              onDeleteChat={async (chatId) => {
+                if (confirm('Delete this chat?')) {
+                  try {
+                    await chatAPI.deleteChat(chatId);
+                    setChats((prev) => prev.filter((c) => c._id !== chatId));
+                    if (selectedChat?._id === chatId) setSelectedChat(null);
+                    toast.success('Chat deleted');
+                  } catch (err) {
+                    console.error('Delete chat failed', err);
+                    toast.error('Failed to delete chat');
+                  }
+                }
+              }}
+              currentUserId={user!.id}
             />
           ) : (
-            <div className="flex w-full h-full items-center justify-center">
-              <p className="text-accent-foreground/50">Select a chat to start messaging</p>
+            <div className='flex w-full h-full'>
+              <ChatWindow
+                chat={selectedChat}
+                userId={user!.id}
+                onClose={() => setSelectedChat(null)}
+              />
             </div>
           )}
         </div>
-      </div>
-    </Layout>
+      ) : (
+        // Desktop view: show both chat list and chat window
+        <div className="flex h-full rounded overflow-hidden">
+          <ChatList
+            chats={chats}
+            selectedChat={selectedChat}
+            onSelectChat={setSelectedChat}
+            onDeleteChat={async (chatId) => {
+              if (confirm('Delete this chat?')) {
+                try {
+                  await chatAPI.deleteChat(chatId);
+                  setChats((prev) => prev.filter((c) => c._id !== chatId));
+                  if (selectedChat?._id === chatId) setSelectedChat(null);
+                  toast.success('Chat deleted');
+                } catch (err) {
+                  console.error('Delete chat failed', err);
+                  toast.error('Failed to delete chat');
+                }
+              }
+            }}
+            currentUserId={user!.id}
+          />
+          <div className='flex w-full h-full'>
+            {selectedChat ? (
+              <ChatWindow
+                chat={selectedChat}
+                userId={user!.id}
+                onClose={() => setSelectedChat(null)}
+              />
+            ) : (
+              <div className="flex w-full h-full items-center justify-center">
+                <p className="text-accent-foreground/50">Select a chat to start messaging</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
-};
+}
 
 export default Messages;

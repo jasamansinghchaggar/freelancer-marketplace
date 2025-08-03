@@ -15,6 +15,9 @@ export interface IUser extends Document {
   lastSeen: Date;
   createdAt: Date;
   updatedAt: Date;
+  // fields for password reset
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
 }
 
 
@@ -29,6 +32,9 @@ const UserSchema: Schema = new Schema<IUser>(
     profileCompleted: { type: Boolean, default: false },
     online: { type: Boolean, default: false },
     lastSeen: { type: Date, default: Date.now },
+    // fields for password reset
+    resetPasswordToken: { type: String, required: false, select: false },
+    resetPasswordExpires: { type: Date, required: false },
   },
   { timestamps: true }
 );

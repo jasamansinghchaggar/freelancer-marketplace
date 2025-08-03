@@ -1,4 +1,6 @@
 import { User, IUser } from "../models/user.model";
+import crypto from 'crypto';
+import { hashPassword } from '../utils/hashPassword';
 
 export const getUserById = async (userId: string): Promise<IUser | null> => {
   return await User.findById(userId);
@@ -75,8 +77,34 @@ export const findUserByEmail = async (email: string): Promise<any> => {
   return user;
 };
 
+// generate and save reset token
+export const generatePasswordResetToken = async (email: string): Promise<{ token: string; user: IUser }> => {
+  const user = await User.findOne({ email });
+  if (!user) throw new Error('No user with that email');
+  const token = crypto.randomBytes(32).toString('hex');
+  user.resetPasswordToken = token;
+  user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hr
+  await user.save();
+  return { token, user };
+};
+
+// find user by valid reset token
+export const findUserByResetToken = async (token: string): Promise<IUser | null> => {
+  return await User.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: new Date() } }).select('+password');
+};
+
 export const createUser = async (userData: Partial<IUser>): Promise<IUser> => {
   const user = new User(userData);
   await user.save();
   return user;
+};
+
+/**
+ * Reset user's password and clear reset token fields
+ */
+export const resetUserPassword = async (user: IUser, newPassword: string): Promise<void> => {
+  user.password = await hashPassword(newPassword);
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  await user.save();
 };

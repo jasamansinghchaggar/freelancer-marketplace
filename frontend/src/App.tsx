@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { UnreadProvider } from './context/UnreadContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -28,28 +28,37 @@ import socket from './socket';
 import { chatAPI } from './services/api';
 import React, { useEffect, useState } from 'react';
 import { useAuth } from './context/AuthContext';
+import ForgotPassword from '@/pages/authentication/ForgotPassword';
+import ResetPassword from '@/pages/authentication/ResetPassword';
 
 const GlobalMessageListener: React.FC = () => {
   const { user } = useAuth();
-  const [chats, setChats] = useState<any[]>([]); useEffect(() => {
-    if (!user) return; chatAPI.getChats()
+  const location = useLocation();
+  const [chats, setChats] = useState<any[]>([]);
+  useEffect(() => {
+    if (!user) return;
+    chatAPI.getChats()
       .then((res) => {
         setChats(res.data);
         res.data.forEach((chat: any) => socket.emit('joinChat', chat._id));
       })
-      .catch((err) => console.error('Failed to load or join chats:', err)); const handler = (msg: any) => {
-        if (msg.senderId !== user.id) {
-          const chat = chats.find((c) => c._id === msg.chatId);
-          const other = chat?.participants.find((p: any) => p._id === msg.senderId);
-          const name = other?.name || 'Someone';
-          toast.success(`New message from ${name}`, { description: msg.content });
-        }
-      };
+      .catch((err) => console.error('Failed to load or join chats:', err));
+    const handler = (msg: any) => {
+      // skip own messages
+      if (msg.senderId !== user.id) {
+        // suppress global popup when on messages page; local handler will manage toasts when needed
+        if (location.pathname.startsWith('/messages')) return;
+        const chat = chats.find((c) => c._id === msg.chatId);
+        const other = chat?.participants.find((p: any) => p._id === msg.senderId);
+        const name = other?.name || 'Someone';
+        toast.success(`New message from ${name}`, { description: msg.content });
+      }
+    };
     socket.on('receiveMessage', handler);
     return () => {
       socket.off('receiveMessage', handler);
     };
-  }, [user, chats]);
+  }, [user, chats, location.pathname]);
   return null;
 };
 
@@ -58,10 +67,12 @@ function App() {
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <AuthProvider>
         <UnreadProvider>
-          <GlobalMessageListener />
           <Router>
-          <div className="min-h-screen no-scrollbar">
+            <GlobalMessageListener />
+            <div className="min-h-screen no-scrollbar">
             <Routes>
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/" element={<LandingPage />} />
               <Route path="/signin" element={<SignIn />} />
               <Route path="/signup" element={<SignUp />} />
