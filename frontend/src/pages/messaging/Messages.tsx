@@ -119,28 +119,35 @@ const Messages: React.FC = () => {
       <Navbar />
       {/* Mobile/tablet view: show only chat list or chat window */}
       {isMobile ? (
-        // On mobile (below md), only show chat list
-        <div className="h-full w-screen">
-          <ChatList
-            chats={chats}
-            selectedChat={selectedChat}
-            onSelectChat={setSelectedChat}
-            onDeleteChat={async (chatId) => {
-              if (confirm('Delete this chat?')) {
-                try {
-                  await chatAPI.deleteChat(chatId);
-                  setChats((prev) => prev.filter((c) => c._id !== chatId));
-                  if (selectedChat?._id === chatId) setSelectedChat(null);
-                  toast.success('Chat deleted');
-                } catch (err) {
-                  console.error('Delete chat failed', err);
-                  toast.error('Failed to delete chat');
-                }
-              }
-            }}
-            currentUserId={user!.id}
+        selectedChat ? (
+          <ChatWindow
+            chat={selectedChat}
+            userId={user!.id}
+            onClose={() => setSelectedChat(null)}
           />
-        </div>
+        ) : (
+          <div className="h-full w-screen">
+            <ChatList
+              chats={chats}
+              selectedChat={selectedChat}
+              onSelectChat={setSelectedChat}
+              onDeleteChat={async (chatId) => {
+                if (confirm('Delete this chat?')) {
+                  try {
+                    await chatAPI.deleteChat(chatId);
+                    setChats((prev) => prev.filter((c) => c._id !== chatId));
+                    if (selectedChat?._id === chatId) setSelectedChat(null);
+                    toast.success('Chat deleted');
+                  } catch (err) {
+                    console.error('Delete chat failed', err);
+                    toast.error('Failed to delete chat');
+                  }
+                }
+              }}
+              currentUserId={user!.id}
+            />
+          </div>
+        )
       ) : (
         // Desktop view: show both chat list and chat window
         <div className="flex h-full rounded overflow-hidden">
