@@ -120,11 +120,13 @@ const Messages: React.FC = () => {
       {/* Mobile/tablet view: show only chat list or chat window */}
       {isMobile ? (
         selectedChat ? (
-          <ChatWindow
-            chat={selectedChat}
-            userId={user!.id}
-            onClose={() => setSelectedChat(null)}
-          />
+          <div className='h-[dvh]'>
+            <ChatWindow
+              chat={selectedChat}
+              userId={user!.id}
+              onClose={() => setSelectedChat(null)}
+            />
+          </div>
         ) : (
           <div className="h-full w-screen">
             <ChatList

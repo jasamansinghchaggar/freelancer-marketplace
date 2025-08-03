@@ -43,8 +43,10 @@ const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelectChat, 
     const { unreadChats, clearUnread } = useUnread();
     // Decrypted preview of last messages
     const [decryptedLast, setDecryptedLast] = useState<Record<string, string>>({});
+    const kp = loadKeyPair();
+    const publicKey = kp?.publicKey;
+    const secretKey = kp?.secretKey;
     useEffect(() => {
-        const kp = loadKeyPair();
         const map: Record<string, string> = {};
         chats.forEach(chat => {
             const other = chat.participants.find(u => u._id !== currentUserId);
@@ -57,7 +59,7 @@ const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelectChat, 
             map[chat._id] = text;
         });
         setDecryptedLast(map);
-    }, [chats, currentUserId]);
+    }, [chats, currentUserId, publicKey, secretKey]);
 
     const filtered = chats.filter(chat => {
         const other = chat.participants.find(u => u._id !== currentUserId);
