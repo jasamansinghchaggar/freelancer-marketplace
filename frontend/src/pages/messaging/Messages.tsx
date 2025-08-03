@@ -55,6 +55,11 @@ const Messages: React.FC = () => {
   useEffect(() => {
     const handler = (msg: any) => {
       const chatId = msg.chatId || msg.chat;
+      // update lastMessage preview for the chat
+      setChats(prevChats => prevChats.map(chat => chat._id === chatId
+        ? { ...chat, lastMessage: { nonce: msg.nonce, cipher: msg.cipher, content: msg.content, senderId: msg.senderId, createdAt: msg.createdAt } }
+        : chat
+      ));
       if (selectedChat?._id !== chatId) {
         const chat = chats.find((c) => c._id === chatId);
         const other = chat?.participants.find((p: any) => p._id !== user!.id);
@@ -120,13 +125,11 @@ const Messages: React.FC = () => {
       {/* Mobile/tablet view: show only chat list or chat window */}
       {isMobile ? (
         selectedChat ? (
-          <div className='h-[dvh]'>
             <ChatWindow
               chat={selectedChat}
               userId={user!.id}
               onClose={() => setSelectedChat(null)}
             />
-          </div>
         ) : (
           <div className="h-full w-screen">
             <ChatList
