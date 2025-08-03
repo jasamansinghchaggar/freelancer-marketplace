@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { RiImageLine } from '@remixicon/react';
 import { chatAPI } from '@/services/api';
+import { loadKeyPair, deriveSharedKey, encrypt, decrypt } from '@/utils/crypto';
 import socket from '@/socket';
 import { RiPencilLine, RiDeleteBinLine, RiMore2Fill, RiCheckLine, RiCheckDoubleLine, RiCloseLine } from '@remixicon/react';
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from '../ui/dialog';
@@ -14,13 +15,15 @@ type Chat = {
         name: string;
         online?: boolean;
         lastSeen?: string;
+        publicKey?: string;
     }[];
 };
-// Define message including read status
 type Message = {
     _id: string;
     senderId: string;
     content?: string;
+    nonce?: string;
+    cipher?: string;
     imageUrl?: string;
     createdAt: string;
     isRead: boolean;
@@ -44,22 +47,42 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chat, userId, onClose }) => {
 
     useEffect(() => {
         const chatId = chat._id;
-        // load existing messages, mark delivered/read based on isRead
-        chatAPI.getMessages(chatId).then((res) => {
-            const msgs = res.data.map((m: Message) => ({
-                ...m,
-                status: m.isRead ? 'read' : 'delivered'
-            }));
+        // load existing messages and decrypt if needed
+        async function loadMsgs() {
+            const res = await chatAPI.getMessages(chatId);
+            const kp = loadKeyPair();
+            const other = chat.participants.find(p => p._id !== userId);
+            const shared = kp && other?.publicKey
+                ? deriveSharedKey(kp.secretKey, other.publicKey)
+                : null;
+            const msgs = res.data.map((m: Message) => {
+                let content = m.content || '';
+                if (shared && m.nonce && m.cipher) {
+                    const dec = decrypt(shared, m.nonce, m.cipher);
+                    if (dec) content = dec;
+                }
+                return { ...m, content, status: m.isRead ? 'read' : 'delivered' };
+            });
             setMessages(msgs);
-        });
+        }
+        loadMsgs();
         socket.emit('joinChat', chatId);
         const receiveHandler = (msg: Message) => {
             setMessages((prev) => {
                 const filtered = prev.filter((m) => !m._id.startsWith('temp-'));
-                return [
-                    ...filtered,
-                    { ...msg, status: msg.isRead ? 'read' : 'delivered' }
-                ];
+            // decrypt incoming message if encrypted
+            const kp = loadKeyPair();
+            const other = chat.participants.find(p => p._id !== userId);
+            let content = msg.content || '';
+            if (kp && other?.publicKey && msg.nonce && msg.cipher) {
+                const shared = deriveSharedKey(kp.secretKey, other.publicKey);
+                const dec = decrypt(shared, msg.nonce, msg.cipher);
+                if (dec) content = dec;
+            }
+            return [
+                ...filtered,
+                { ...msg, content, status: msg.isRead ? 'read' : 'delivered' }
+            ];
             });
         };
         socket.on('receiveMessage', receiveHandler);
@@ -83,7 +106,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chat, userId, onClose }) => {
             status: 'sending'
         };
         setMessages((prev) => [...prev, tempMsg]);
-        socket.emit('sendMessage', { chatId, senderId: userId, content: text });
+        // prepare payload: encrypt if possible
+        const kp = loadKeyPair();
+        const other = chat.participants.find(p => p._id !== userId);
+        let payload: any = { chatId, senderId: userId };
+        if (kp && other?.publicKey) {
+            const shared = deriveSharedKey(kp.secretKey, other.publicKey);
+            const box = encrypt(shared, text);
+            payload = { ...payload, nonce: box.nonce, cipher: box.data };
+        } else {
+            payload = { ...payload, content: text };
+        }
+        socket.emit('sendMessage', payload);
         setNewMessage('');
     };
     // Handle image file selection and upload

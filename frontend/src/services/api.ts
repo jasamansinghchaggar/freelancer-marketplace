@@ -32,6 +32,8 @@ export const profileAPI = {
   },
 
   getProfileStatus: () => apiClient.get("/api/v1/profile/status"),
+  
+  setPublicKey: (publicKey: string) => apiClient.post("/api/v1/profile/publicKey", { publicKey }),
 };
 
 export const gigsAPI = {

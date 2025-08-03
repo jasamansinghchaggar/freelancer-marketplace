@@ -24,6 +24,7 @@ import Sales from './pages/marketplace/Sales';
 import { ThemeProvider } from './components/theme-provider';
 import { Toaster } from './components/ui/sonner';
 import { toast } from 'sonner';
+import { useUnread } from './context/UnreadContext';
 import socket from './socket';
 import { chatAPI } from './services/api';
 import React, { useEffect, useState } from 'react';
@@ -31,9 +32,11 @@ import { useAuth } from './context/AuthContext';
 import ForgotPassword from '@/pages/authentication/ForgotPassword';
 import ResetPassword from '@/pages/authentication/ResetPassword';
 
+import { loadKeyPair, deriveSharedKey, decrypt } from '@/utils/crypto';
 const GlobalMessageListener: React.FC = () => {
   const { user } = useAuth();
   const location = useLocation();
+  const { addUnread } = useUnread();
   const [chats, setChats] = useState<any[]>([]);
   useEffect(() => {
     if (!user) return;
@@ -44,14 +47,20 @@ const GlobalMessageListener: React.FC = () => {
       })
       .catch((err) => console.error('Failed to load or join chats:', err));
     const handler = (msg: any) => {
-      // skip own messages
       if (msg.senderId !== user.id) {
-        // suppress global popup when on messages page; local handler will manage toasts when needed
         if (location.pathname.startsWith('/messages')) return;
         const chat = chats.find((c) => c._id === msg.chatId);
         const other = chat?.participants.find((p: any) => p._id === msg.senderId);
         const name = other?.name || 'Someone';
-        toast.success(`New message from ${name}`, { description: msg.content });
+        let description = msg.content || '';
+        const kp = loadKeyPair();
+        if (kp && other?.publicKey && msg.nonce && msg.cipher) {
+          const shared = deriveSharedKey(kp.secretKey, other.publicKey);
+          const dec = decrypt(shared, msg.nonce, msg.cipher);
+          if (dec) description = dec;
+        }
+        toast.success(`New message from ${name}`, { description });
+        addUnread(msg.chatId);
       }
     };
     socket.on('receiveMessage', handler);
@@ -70,106 +79,106 @@ function App() {
           <Router>
             <GlobalMessageListener />
             <div className="min-h-screen no-scrollbar">
-            <Routes>
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/signin" element={<SignIn />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/auth/google/callback" element={<GoogleCallback />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route
-                path="/complete-profile"
-                element={
+              <Routes>
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/signin" element={<SignIn />} />
+                <Route path="/signup" element={<SignUp />} />
+                <Route path="/auth/google/callback" element={<GoogleCallback />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route
+                  path="/complete-profile"
+                  element={
+                    <ProtectedRoute>
+                      <CompleteProfile />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/home"
+                  element={
+                    <ProtectedRoute>
+                      <Home />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/gigs/new"
+                  element={
+                    <ProtectedRoute>
+                      <CreateGig />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/gigs"
+                  element={
+                    <ProtectedRoute>
+                      <Gigs />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/gigs/:id"
+                  element={
+                    <ProtectedRoute>
+                      <GigDetail />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/messages" element={
                   <ProtectedRoute>
-                    <CompleteProfile />
+                    <Messages />
                   </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/home"
-                element={
-                  <ProtectedRoute>
-                    <Home />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/gigs/new"
-                element={
-                  <ProtectedRoute>
-                    <CreateGig />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/gigs"
-                element={
-                  <ProtectedRoute>
-                    <Gigs />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/gigs/:id"
-                element={
-                  <ProtectedRoute>
-                    <GigDetail />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/messages" element={
-                <ProtectedRoute>
-                  <Messages />
-                </ProtectedRoute>
-              } />
-              <Route
-                path="/my-gigs"
-                element={
-                  <ProtectedRoute>
-                    <MyGigs />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/gigs/:id/edit"
-                element={
-                  <ProtectedRoute>
-                    <EditGig />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/purchased-gigs"
-                element={
-                  <ProtectedRoute>
-                    <PurchasedGigs />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/sales"
-                element={
-                  <ProtectedRoute>
-                    <Sales />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
-          <Toaster />
-        </Router>
+                } />
+                <Route
+                  path="/my-gigs"
+                  element={
+                    <ProtectedRoute>
+                      <MyGigs />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/gigs/:id/edit"
+                  element={
+                    <ProtectedRoute>
+                      <EditGig />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/purchased-gigs"
+                  element={
+                    <ProtectedRoute>
+                      <PurchasedGigs />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/sales"
+                  element={
+                    <ProtectedRoute>
+                      <Sales />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+            <Toaster />
+          </Router>
         </UnreadProvider>
       </AuthProvider>
     </ThemeProvider>

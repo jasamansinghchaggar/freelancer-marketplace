@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -7,7 +7,8 @@ import {
     DropdownMenuShortcut
 } from '../ui/dropdown-menu';
 import { useUnread } from '../../context/UnreadContext';
-import { RiDeleteBinLine, RiMore2Fill } from '@remixicon/react';
+import { loadKeyPair, deriveSharedKey, decrypt } from '@/utils/crypto';
+import { RiArrowLeftDownLine, RiArrowRightUpLine, RiDeleteBinLine, RiMore2Fill } from '@remixicon/react';
 import { Link } from 'react-router-dom';
 
 type Chat = {
@@ -17,10 +18,14 @@ type Chat = {
         name: string;
         online?: boolean;
         lastSeen?: string;
+        publicKey?: string;
     }[];
     updatedAt: string;
     lastMessage?: {
-        content: string;
+        content?: string;
+        nonce?: string;
+        cipher?: string;
+        senderId?: string;
         createdAt: string;
     };
 };
@@ -36,6 +41,23 @@ interface ChatListProps {
 const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelectChat, currentUserId, onDeleteChat }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const { unreadChats, clearUnread } = useUnread();
+    // Decrypted preview of last messages
+    const [decryptedLast, setDecryptedLast] = useState<Record<string, string>>({});
+    useEffect(() => {
+        const kp = loadKeyPair();
+        const map: Record<string, string> = {};
+        chats.forEach(chat => {
+            const other = chat.participants.find(u => u._id !== currentUserId);
+            let text = chat.lastMessage?.content || '';
+            if (kp && other?.publicKey && chat.lastMessage?.nonce && chat.lastMessage?.cipher) {
+                const shared = deriveSharedKey(kp.secretKey, other.publicKey);
+                const dec = decrypt(shared, chat.lastMessage.nonce, chat.lastMessage.cipher);
+                if (dec) text = dec;
+            }
+            map[chat._id] = text;
+        });
+        setDecryptedLast(map);
+    }, [chats, currentUserId]);
 
     const filtered = chats.filter(chat => {
         const other = chat.participants.find(u => u._id !== currentUserId);
@@ -44,7 +66,7 @@ const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelectChat, 
         return name.includes(term);
     });
     return (
-        <div className="w-1/3 border-r overflow-y-auto">
+        <div className="w-full md:w-1/3 border-r overflow-y-auto h-full">
             <div className='flex items-center justify-between'>
                 <h2 className="p-4 font-semibold">Chats</h2>
                 <Link className='p-4 font-semibold underline underline-offset-2' to={"/"}>Back</Link>
@@ -76,7 +98,14 @@ const ChatList: React.FC<ChatListProps> = ({ chats, selectedChat, onSelectChat, 
                             <div className="flex flex-col w-full">
                                 <p className="text-md font-bold text-accent-foreground">{name}</p>
                                 <div className='flex items-center justify-between'>
-                                    <p className="text-sm text-accent-foreground/70 truncate">{chat.lastMessage?.content || ''}</p>
+                                    <p className="text-sm text-accent-foreground/70 truncate flex items-center gap-1">
+                                        {chat.lastMessage?.senderId === currentUserId ? (
+                                            <span><RiArrowRightUpLine className='text-green-500' size={16}/></span>
+                                        ) : (
+                                            <span><RiArrowLeftDownLine className='text-destructive' size={16}/></span>
+                                        )}
+                                        {decryptedLast[chat._id] ?? chat.lastMessage?.content ?? ''}
+                                    </p>
                                     <p className="text-sm text-accent-foreground/70">{chat.lastMessage?.createdAt ? new Date(chat.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hourCycle: 'h12' }) : ''}</p>
                                 </div>
                             </div>

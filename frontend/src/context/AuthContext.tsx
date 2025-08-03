@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { authAPI } from '../services/api';
+import { authAPI, profileAPI } from '../services/api';
+import { generateKeyPair, loadKeyPair, saveKeyPair } from '../utils/crypto';
 
 const backendUrl = import.meta.env.VITE_API_BASE_URL
 
@@ -117,5 +118,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loading,
   };
 
+  useEffect(() => {
+    if (!loading && user) {
+      const existing = loadKeyPair();
+      const uploadKey = async (publicKey: string) => {
+        try {
+          await profileAPI.setPublicKey(publicKey);
+        } catch (err) {
+          console.error('Failed to set public key:', err);
+        }
+      };
+      if (!existing) {
+        const { publicKey, secretKey } = generateKeyPair();
+        saveKeyPair({ publicKey, secretKey });
+        if (user.profileCompleted) uploadKey(publicKey);
+      }
+    }
+  }, [loading, user]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

@@ -46,7 +46,8 @@ export const startOrGetChat = async (req: AuthenticatedRequest, res: Response) =
 export const sendMessageRest = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { chatId } = req.params;
-    const { content, imageUrl } = req.body;
+    // support encrypted payload: content or (nonce, data)
+    const { nonce, data: cipher, content, imageUrl } = req.body;
     const senderId = req.user?.id;
     if (!senderId) return res.status(401).json({ message: 'Unauthorized' });
     if (!mongoose.Types.ObjectId.isValid(chatId)) return res.status(400).json({ message: 'Invalid chat ID' });
@@ -56,9 +57,26 @@ export const sendMessageRest = async (req: AuthenticatedRequest, res: Response) 
     const participants = chat.participants.map(id => id.toString());
     const receiverId = participants.find(id => id !== senderId.toString());
     if (!receiverId) return res.status(400).json({ message: 'Cannot determine receiver' });
-    const newMsg = await Message.create({ chatId, senderId, receiverId, content, imageUrl, isRead: false });
-    // Update chat lastMessage
-    await Chat.findByIdAndUpdate(chatId, { lastMessage: { content: content || 'Image', createdAt: newMsg.createdAt } }).exec();
+    // Create and save message
+    const newMsg = await Message.create({
+      chatId,
+      senderId,
+      receiverId,
+      content,
+      nonce,
+      cipher,
+      imageUrl,
+      isRead: false
+    });
+    // Update lastMessage with full encryption fields for preview
+    await Chat.findByIdAndUpdate(chatId, {
+      lastMessage: {
+        content: newMsg.content,
+        nonce: newMsg.nonce,
+        cipher: newMsg.cipher,
+        createdAt: newMsg.createdAt
+      }
+    }).exec();
     res.status(201).json(newMsg);
   } catch (err) {
     res.status(500).json({ message: 'Failed to send message', error: err });

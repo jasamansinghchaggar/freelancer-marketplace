@@ -3,7 +3,10 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IChat extends Document {
   participants: mongoose.Types.ObjectId[];
   lastMessage?: {
-    content: string;
+    content?: string;
+    nonce?: string;
+    cipher?: string;
+    senderId?: mongoose.Types.ObjectId;
     createdAt: Date;
   };
   createdAt: Date;
@@ -17,6 +20,9 @@ const ChatSchema: Schema = new Schema<IChat>(
     ],
     lastMessage: {
       content: { type: String, required: false },
+      nonce: { type: String, required: false },
+      cipher: { type: String, required: false },
+      senderId: { type: Schema.Types.ObjectId, ref: 'User', required: false },
       createdAt: { type: Date, required: false }
     }
   },

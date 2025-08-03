@@ -120,3 +120,16 @@ export const getProfileStatus = async (req: AuthenticatedRequest, res: Response)
         });
     }
 };
+
+export const setPublicKey = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { publicKey } = req.body;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    if (!publicKey) return res.status(400).json({ error: 'publicKey is required' });
+    const updated = await updateUserProfile(userId, { publicKey });
+    res.json({ message: 'Public key saved' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to save public key', error });
+  }
+};

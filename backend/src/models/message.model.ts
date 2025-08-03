@@ -5,6 +5,8 @@ export interface IMessage extends Document {
   senderId: mongoose.Types.ObjectId;
   receiverId: mongoose.Types.ObjectId;
   content?: string;
+  nonce?: string;
+  cipher?: string;
   imageUrl?: string;
   imageFileId?: string;
   isRead: boolean;
@@ -17,6 +19,8 @@ const MessageSchema: Schema = new Schema<IMessage>(
     senderId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     receiverId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     content: { type: String, required: false },
+    nonce: { type: String, required: false },
+    cipher: { type: String, required: false },
     imageUrl: { type: String, required: false },
     imageFileId: { type: String, required: false },
     isRead: { type: Boolean, default: false }

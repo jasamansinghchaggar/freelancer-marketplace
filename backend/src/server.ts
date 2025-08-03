@@ -132,7 +132,8 @@ const startServer = async (): Promise<void> => {
       });
 
       socket.on("sendMessage", async (data) => {
-        const { chatId, senderId, content, imageUrl } = data || {};
+        // support encrypted payloads: content or (nonce,data)
+        const { chatId, senderId, content, imageUrl, nonce, cipher } = data || {};
         if (!senderId) {
           console.warn('sendMessage: missing senderId, skipping');
           return;
@@ -149,14 +150,23 @@ const startServer = async (): Promise<void> => {
           senderId,
           receiverId,
           content,
+          nonce,
+          cipher,
           imageUrl,
           isRead: false,
         });
         // Update lastMessage in chat
+        // Update lastMessage with full encryption fields
         await Chat.findByIdAndUpdate(chatId, {
-          lastMessage: { content: content || "Image", createdAt: newMessage.createdAt },
+          lastMessage: {
+            content: newMessage.content,
+            nonce: newMessage.nonce,
+            cipher: newMessage.cipher,
+            senderId: newMessage.senderId,
+            createdAt: newMessage.createdAt
+          }
         }).exec();
-        io.to(chatId).emit("receiveMessage", newMessage);
+        io.to(chatId).emit("receiveMessage", newMessage.toObject());
       });
 
       socket.on("disconnect", () => {
