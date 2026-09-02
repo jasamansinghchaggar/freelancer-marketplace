@@ -65,4 +65,6 @@ Freelancer Marketplace is a full-stack web application that connects clients wit
 
 ### User Roles & Permissions
 - Role-based middleware for access control
-- Different features for clients and freelancers
+- Different features for clients and freelancers.
+
+Made with love.!
